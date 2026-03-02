@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">GarageHub</string>
+    <string name="login_title">Portal Oficina</string>
+    <string name="login_subtitle">Acesse com seu e-mail e senha.</string>
+    <string name="email_label">E-mail</string>
+    <string name="email_placeholder">voce@oficina.com</string>
+    <string name="password_label">Senha</string>
+    <string name="password_placeholder">Sua senha</string>
+    <string name="login_button">Entrar</string>
+    <string name="forgot_password">Esqueci minha senha</string>
+    <string name="no_account">Ainda não tem cadastro?</string>
+    <string name="create_account">Criar conta</string>
+
+    <string name="create_account_title">Criar conta da Oficina</string>
+    <string name="create_account_subtitle">Crie seu acesso inicial. Você poderá completar os dados da oficina (CNPJ, Endereço) no seu perfil.</string>
+    <string name="name_label">Nome do Responsável</string>
+    <string name="name_placeholder">Seu nome</string>
+    <string name="whatsapp_label">WhatsApp</string>
+    <string name="whatsapp_placeholder">(00) 00000-0000</string>
+    <string name="password_hint">Min. 6 caracteres</string>
+    <string name="confirm_password_label">Confirmar senha</string>
+    <string name="confirm_password_placeholder">Repita a senha</string>
+    <string name="create_account_button">Criar Conta</string>
+    <string name="already_have_account">Já tenho conta</string>
+
+    <string name="forgot_password_title">Recuperar Senha</string>
+    <string name="forgot_password_subtitle">Digite seu e-mail para receber o link de redefinição.</string>
+    <string name="forgot_password_email_placeholder">Seu e-mail cadastrado</string>
+    <string name="forgot_password_send_button">Enviar Link</string>
+    <string name="forgot_password_back_to_login">Voltar ao Login</string>
+</resources>
