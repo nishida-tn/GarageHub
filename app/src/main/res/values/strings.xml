@@ -78,4 +78,29 @@
     <string name="select_option">Selecione</string>
     <string name="select_brand_option">Selecione a marca</string>
     <string name="select_model_option">Selecione o modelo</string>
+
+    <string name="settings_title">Configurações</string>
+    <string name="back_button">Voltar</string>
+    <string name="workshop_data_title">Dados da Oficina</string>
+    <string name="fantasy_name_label">Nome Fantasia (Loja)</string>
+    <string name="login_email_label">E-mail de Login</string>
+    <string name="cnpj_label">CNPJ</string>
+    <string name="landline_label">Telefone Fixo</string>
+    <string name="address_label">Endereço</string>
+    <string name="complement_optional_label">Complemento (opc.)</string>
+    <string name="logo_label">Logotipo (Sairá no PDF)</string>
+    <string name="change_logo_button">Alterar Logo</string>
+    <string name="logo_description">PNG ou JPG. Será redimensionado automaticamente.</string>
+    <string name="save_data_button">Salvar Dados</string>
+    <string name="security_title">Segurança</string>
+    <string name="current_password_label">Senha atual</string>
+    <string name="new_password_label">Nova senha</string>
+    <string name="confirm_label">Confirmar</string>
+    <string name="change_password_button">Alterar senha</string>
+    <string name="labor_title">Mão de Obra (Padrão)</string>
+    <string name="mechanics_hour_label">Mecânica / h</string>
+    <string name="painting_hour_label">Pintura / h</string>
+    <string name="current_password_placeholder">Senha atual</string>
+    <string name="new_password_placeholder">Nova senha</string>
+    <string name="confirm_password_placeholder_settings">Repita a nova senha</string>
 </resources>

@@ -42,6 +42,9 @@ android {
     buildFeatures {
         compose = true
     }
+    packagingOptions {
+        resources.excludes.add("META-INF/gradle/incremental.annotation.processors")
+    }
 }
 
 dependencies {
@@ -54,12 +57,9 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.hilt.compiler)
-    implementation(libs.hilt.android.compiler)
     implementation(libs.androidx.appcompat)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
-    implementation(libs.room.compiler)
     implementation(libs.android.work)
     implementation(libs.android.work.ktx)
     implementation(libs.kotlin.serialization.json)
@@ -74,6 +74,8 @@ dependencies {
     kapt(libs.room.compiler)
 
     testImplementation(libs.junit)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.kotlinx.coroutines.test)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

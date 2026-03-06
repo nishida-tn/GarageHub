@@ -3,6 +3,7 @@ package com.hsgaragepecas.garagehub.navigation
 import androidx.navigation.NavController
 import com.hsgaragepecas.garagehub.ui.account.create.navigation.navigateToCreateAccountScreen
 import com.hsgaragepecas.garagehub.ui.account.login.navigation.navigateToLoginScreen
+import com.hsgaragepecas.garagehub.ui.settings.navigation.navigateToSettingsScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -11,6 +12,7 @@ abstract class Route {
         when (this) {
             is Login -> navController.navigateToLoginScreen()
             is CreateAccount -> navController.navigateToCreateAccountScreen()
+            is Settings -> navController.navigateToSettingsScreen()
         }
     }
 }
@@ -23,3 +25,6 @@ data object CreateAccount : Route()
 
 @Serializable
 data object ForgotPassword : Route()
+
+@Serializable
+data object Settings : Route()

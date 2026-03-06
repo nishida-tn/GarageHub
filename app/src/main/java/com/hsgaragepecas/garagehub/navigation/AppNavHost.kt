@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.hsgaragepecas.garagehub.ui.account.login.navigation.loginScreen
+import com.hsgaragepecas.garagehub.ui.settings.navigation.settingsScreen
 
 @Composable
 fun AppNavHost(
@@ -14,5 +15,6 @@ fun AppNavHost(
         startDestination = Login
     ) {
         loginScreen(navController)
+        settingsScreen()
     }
 }

@@ -2,7 +2,6 @@ package com.hsgaragepecas.garagehub.ui.estimate
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hsgaragepecas.garagehub.R
+import com.hsgaragepecas.garagehub.ui.common.GarageTopAppBar
 import com.hsgaragepecas.garagehub.ui.theme.GarageDarkBackground
 import com.hsgaragepecas.garagehub.ui.theme.GarageDivider
 import com.hsgaragepecas.garagehub.ui.theme.GarageGreyText
@@ -60,34 +60,7 @@ fun CreateEstimateScreen(
             .verticalScroll(scrollState)
             .padding(16.dp)
     ) {
-        // Top Header
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Button(
-                onClick = { },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = GarageYellow.copy(alpha = 0.1f),
-                    contentColor = GarageYellow
-                ),
-                shape = RoundedCornerShape(4.dp),
-                modifier = Modifier.border(1.dp, GarageYellow, RoundedCornerShape(4.dp)),
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
-            ) {
-                Text(text = "≡ " + stringResource(R.string.menu_button), fontSize = 14.sp)
-            }
-
-            Text(
-                text = stringResource(R.string.portal_oficina),
-                style = TextStyle(
-                    color = GarageYellow,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            )
-        }
+        GarageTopAppBar(onMenuClick = { /*TODO*/ })
 
         Spacer(modifier = Modifier.height(32.dp))
 
