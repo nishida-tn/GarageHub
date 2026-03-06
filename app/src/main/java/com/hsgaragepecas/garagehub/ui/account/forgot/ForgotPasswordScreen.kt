@@ -41,6 +41,13 @@ import com.hsgaragepecas.garagehub.ui.theme.GarageGreyText
 import com.hsgaragepecas.garagehub.ui.theme.GarageHubTheme
 import com.hsgaragepecas.garagehub.ui.theme.GarageYellow
 
+/**
+ * A screen that allows the user to reset their password.
+ *
+ * @param modifier The modifier to be applied to the screen.
+ * @param onSendLinkClick A lambda to be called when the send link button is clicked.
+ * @param onBackToLoginClick A lambda to be called when the back to login button is clicked.
+ */
 @Composable
 fun ForgotPasswordScreen(
     modifier: Modifier = Modifier,

@@ -16,6 +16,12 @@ import androidx.compose.ui.unit.sp
 import com.hsgaragepecas.garagehub.R
 import com.hsgaragepecas.garagehub.ui.theme.GarageYellow
 
+/**
+ * A custom top app bar for the GarageHub application.
+ *
+ * @param onMenuClick A lambda to be called when the menu button is clicked.
+ * @param modifier The modifier to be applied to the top app bar.
+ */
 @Composable
 fun GarageTopAppBar(
     onMenuClick: () -> Unit,

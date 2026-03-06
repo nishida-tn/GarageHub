@@ -50,6 +50,12 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 
+/**
+ * A screen that allows the user to change the application settings.
+ *
+ * @param modifier The modifier to be applied to the screen.
+ * @param viewModel The view model that manages the state of the screen.
+ */
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier,
@@ -107,6 +113,12 @@ fun SettingsScreen(
     }
 }
 
+/**
+ * A composable that displays the workshop data section of the settings screen.
+ *
+ * @param uiState The state of the settings screen.
+ * @param viewModel The view model that manages the state of the screen.
+ */
 @Composable
 private fun WorkshopDataSection(
     uiState: SettingsUiState,
@@ -194,6 +206,12 @@ private fun WorkshopDataSection(
     }
 }
 
+/**
+ * A composable that displays the security section of the settings screen.
+ *
+ * @param uiState The state of the settings screen.
+ * @param viewModel The view model that manages the state of the screen.
+ */
 @Composable
 private fun SecuritySection(
     uiState: SettingsUiState,
@@ -240,6 +258,12 @@ private fun SecuritySection(
     }
 }
 
+/**
+ * A composable that displays the labor section of the settings screen.
+ *
+ * @param uiState The state of the settings screen.
+ * @param viewModel The view model that manages the state of the screen.
+ */
 @Composable
 private fun LaborSection(
     uiState: SettingsUiState,
@@ -264,6 +288,12 @@ private fun LaborSection(
     }
 }
 
+/**
+ * A composable that displays a card for a section of the settings screen.
+ *
+ * @param title The title of the section.
+ * @param content The content of the section.
+ */
 @Composable
 private fun SettingsSectionCard(
     title: String,
@@ -286,6 +316,17 @@ private fun SettingsSectionCard(
     }
 }
 
+/**
+ * A composable that displays an input field for the settings screen.
+ *
+ * @param label The label to be displayed above the input field.
+ * @param value The value of the input field.
+ * @param modifier The modifier to be applied to the input field.
+ * @param onValueChange A lambda to be called when the value of the input field changes.
+ * @param placeholder The placeholder to be displayed in the input field.
+ * @param enabled Whether the input field is enabled.
+ * @param visualTransformation The visual transformation to be applied to the input field.
+ */
 @Composable
 private fun SettingsInputField(
     label: String,

@@ -17,8 +17,8 @@ work-runtime = "2.11.0"
 apache-commons = "3.20.0"
 kotlin-serialization-json = "1.9.0"
 coil = "2.7.0"
-mockito = "6.2.3"
 coroutinesTest = "1.10.2"
+mockk = "1.13.10"
 
 
 [libraries]
@@ -51,8 +51,8 @@ android-work = { module = "androidx.work:work-runtime", version.ref = "work-runt
 apache-commons = { module= "org.apache.commons:commons-lang3", version.ref = "apache-commons"}
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization-json" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
-mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockito" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

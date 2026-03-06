@@ -33,6 +33,13 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+/**
+ * The main theme for the GarageHub application.
+ *
+ * @param darkTheme Whether the theme should be dark or light.
+ * @param dynamicColor Whether to use dynamic color (available on Android 12+).
+ * @param content The content to be displayed within the theme.
+ */
 @Composable
 fun GarageHubTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

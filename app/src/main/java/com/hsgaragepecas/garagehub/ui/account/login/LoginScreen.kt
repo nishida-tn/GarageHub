@@ -46,6 +46,14 @@ import com.hsgaragepecas.garagehub.ui.theme.GarageGreyText
 import com.hsgaragepecas.garagehub.ui.theme.GarageHubTheme
 import com.hsgaragepecas.garagehub.ui.theme.GarageYellow
 
+/**
+ * A screen that allows the user to log in to the application.
+ *
+ * @param modifier The modifier to be applied to the screen.
+ * @param onLoginClick A lambda to be called when the login button is clicked.
+ * @param onForgotPasswordClick A lambda to be called when the forgot password button is clicked.
+ * @param onCreateAccountClick A lambda to be called when the create account button is clicked.
+ */
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
@@ -184,6 +192,17 @@ fun LoginScreen(
     }
 }
 
+/**
+ * A composable that displays an input field for the login screen.
+ *
+ * @param label The label to be displayed above the input field.
+ * @param value The value of the input field.
+ * @param onValueChange A lambda to be called when the value of the input field changes.
+ * @param placeholder The placeholder to be displayed in the input field.
+ * @param modifier The modifier to be applied to the input field.
+ * @param visualTransformation The visual transformation to be applied to the input field.
+ * @param keyboardOptions The keyboard options to be applied to the input field.
+ */
 @Composable
 private fun LoginInputField(
     label: String,

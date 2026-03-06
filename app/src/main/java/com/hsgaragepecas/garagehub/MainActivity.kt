@@ -9,6 +9,9 @@ import com.hsgaragepecas.garagehub.navigation.AppNavHost
 import com.hsgaragepecas.garagehub.ui.theme.GarageHubTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * The main activity of the application.
+ */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -47,6 +47,11 @@ import com.hsgaragepecas.garagehub.ui.theme.GarageGreyText
 import com.hsgaragepecas.garagehub.ui.theme.GarageHubTheme
 import com.hsgaragepecas.garagehub.ui.theme.GarageYellow
 
+/**
+ * A screen that allows the user to create a new estimate.
+ *
+ * @param modifier The modifier to be applied to the screen.
+ */
 @Composable
 fun CreateEstimateScreen(
     modifier: Modifier = Modifier
@@ -261,6 +266,11 @@ fun CreateEstimateScreen(
     }
 }
 
+/**
+ * A composable that displays a section header for the estimate screen.
+ *
+ * @param title The title to be displayed in the header.
+ */
 @Composable
 private fun EstimateSectionHeader(title: String) {
     Column {
@@ -276,6 +286,15 @@ private fun EstimateSectionHeader(title: String) {
     }
 }
 
+/**
+ * A composable that displays an input field for the estimate screen.
+ *
+ * @param label The label to be displayed above the input field.
+ * @param value The value of the input field.
+ * @param onValueChange A lambda to be called when the value of the input field changes.
+ * @param modifier The modifier to be applied to the input field.
+ * @param placeholder The placeholder to be displayed in the input field.
+ */
 @Composable
 private fun EstimateInputField(
     label: String,
@@ -313,6 +332,13 @@ private fun EstimateInputField(
     }
 }
 
+/**
+ * A composable that displays a dropdown field for the estimate screen.
+ *
+ * @param label The label to be displayed above the dropdown field.
+ * @param selectedOption The currently selected option in the dropdown field.
+ * @param modifier The modifier to be applied to the dropdown field.
+ */
 @Composable
 private fun EstimateDropdownField(
     label: String,
@@ -347,6 +373,11 @@ private fun EstimateDropdownField(
     }
 }
 
+/**
+ * A composable that displays a checkbox with an input field for the estimate screen.
+ *
+ * @param label The label to be displayed next to the checkbox.
+ */
 @Composable
 private fun ItemCheckBoxWithInput(label: String) {
     var checked by remember { mutableStateOf(false) }
@@ -382,6 +413,13 @@ private fun ItemCheckBoxWithInput(label: String) {
     }
 }
 
+/**
+ * A composable that displays an action button for the estimate screen.
+ *
+ * @param text The text to be displayed on the button.
+ * @param modifier The modifier to be applied to the button.
+ * @param containerColor The container color of the button.
+ */
 @Composable
 private fun ActionButton(
     text: String,

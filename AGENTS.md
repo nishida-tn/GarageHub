@@ -31,6 +31,7 @@ app/src/main/java/com/hsgaragepecas/garagehub/
     - **Intent (Event):** All user actions from the UI must be sent to the ViewModel as explicit Intents/Events.
     - **Effect (Side Effect):** One-time actions (like navigation, snackbars, or toasts) must be handled via `Channel` or `SharedFlow`.
 - Use **Navigation Compose** for all app routing. Ensure routes are clearly defined and separated from the UI components.
+- For navigation, always follow the pattern used in the `LoginNavigation.kt` file, which includes passing the `navController` to the screen's composable in the navigation graph.
 - Follow State Hoisting. Keep UI components stateless where possible.
 - Include `@Preview` for all new UI components.
 
@@ -38,3 +39,6 @@ app/src/main/java/com/hsgaragepecas/garagehub/
 - Favor immutability (`val`) and clear naming.
 - Use `Result<T>` or `sealed interface` for error handling in the Domain layer.
 - Do not leave commented-out code.
+
+## 4. Documentation
+- All new files, classes, and public methods must have KDoc documentation.

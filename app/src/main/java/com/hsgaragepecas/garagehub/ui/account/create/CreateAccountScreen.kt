@@ -47,6 +47,13 @@ import com.hsgaragepecas.garagehub.ui.theme.GarageGreyText
 import com.hsgaragepecas.garagehub.ui.theme.GarageHubTheme
 import com.hsgaragepecas.garagehub.ui.theme.GarageYellow
 
+/**
+ * A screen that allows the user to create a new account.
+ *
+ * @param modifier The modifier to be applied to the screen.
+ * @param onCreateAccountClick A lambda to be called when the create account button is clicked.
+ * @param onBackToLoginClick A lambda to be called when the back to login button is clicked.
+ */
 @Composable
 fun CreateAccountScreen(
     modifier: Modifier = Modifier,
@@ -194,6 +201,18 @@ fun CreateAccountScreen(
     }
 }
 
+/**
+ * A composable that displays an input field for the create account screen.
+ *
+ * @param label The label to be displayed above the input field.
+ * @param value The value of the input field.
+ * @param onValueChange A lambda to be called when the value of the input field changes.
+ * @param placeholder The placeholder to be displayed in the input field.
+ * @param modifier The modifier to be applied to the input field.
+ * @param isRequired Whether the input field is required.
+ * @param visualTransformation The visual transformation to be applied to the input field.
+ * @param keyboardOptions The keyboard options to be applied to the input field.
+ */
 @Composable
 private fun CreateAccountInputField(
     label: String,

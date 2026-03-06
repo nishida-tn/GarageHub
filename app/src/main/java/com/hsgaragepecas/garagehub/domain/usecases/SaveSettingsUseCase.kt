@@ -2,8 +2,28 @@ package com.hsgaragepecas.garagehub.domain.usecases
 
 import javax.inject.Inject
 
+/**
+ * A use case that saves the settings.
+ */
 class SaveSettingsUseCase @Inject constructor() {
 
+    /**
+     * Invokes the use case.
+     *
+     * @param fantasyName The fantasy name.
+     * @param email The email.
+     * @param cnpj The CNPJ.
+     * @param landline The landline.
+     * @param whatsapp The WhatsApp number.
+     * @param cep The CEP.
+     * @param number The number.
+     * @param neighborhood The neighborhood.
+     * @param city The city.
+     * @param uf The UF.
+     * @param complement The complement.
+     * @param logoPath The path to the logo.
+     * @return Whether the settings were saved successfully.
+     */
     operator fun invoke(
         fantasyName: String,
         email: String,

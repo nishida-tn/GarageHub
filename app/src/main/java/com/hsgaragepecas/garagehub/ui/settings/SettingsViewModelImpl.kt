@@ -14,6 +14,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * The implementation of the settings view model.
+ *
+ * @param saveSettingsUseCase The use case for saving the settings.
+ * @param checkPasswordUseCase The use case for checking the password.
+ * @param saveHourlyRatesUseCase The use case for saving the hourly rates.
+ */
 @HiltViewModel
 class SettingsViewModelImpl @Inject constructor(
     private val saveSettingsUseCase: SaveSettingsUseCase,

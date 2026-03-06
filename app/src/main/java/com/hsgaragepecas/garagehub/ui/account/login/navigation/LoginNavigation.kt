@@ -8,6 +8,11 @@ import com.hsgaragepecas.garagehub.navigation.Login
 import com.hsgaragepecas.garagehub.ui.account.login.LoginScreen
 import com.hsgaragepecas.garagehub.ui.settings.navigation.navigateToSettingsScreen
 
+/**
+ * Defines the login screen in the navigation graph.
+ *
+ * @param navController The [NavController] that manages the navigation.
+ */
 fun NavGraphBuilder.loginScreen(
     navController: NavController,
 ) {
@@ -18,6 +23,9 @@ fun NavGraphBuilder.loginScreen(
     }
 }
 
+/**
+ * Navigates to the login screen.
+ */
 fun NavController.navigateToLoginScreen() {
     navigateTo(Login)
 }
