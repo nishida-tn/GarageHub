@@ -54,12 +54,11 @@ import com.hsgaragepecas.garagehub.ui.theme.GarageYellow
  */
 @Composable
 fun CreateEstimateScreen(
-    modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
 
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(GarageDarkBackground)
             .verticalScroll(scrollState)

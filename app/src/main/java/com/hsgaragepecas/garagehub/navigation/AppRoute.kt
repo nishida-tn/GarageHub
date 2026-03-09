@@ -3,6 +3,7 @@ package com.hsgaragepecas.garagehub.navigation
 import androidx.navigation.NavController
 import com.hsgaragepecas.garagehub.ui.account.create.navigation.navigateToCreateAccountScreen
 import com.hsgaragepecas.garagehub.ui.account.login.navigation.navigateToLoginScreen
+import com.hsgaragepecas.garagehub.ui.estimate.navigation.navigateToCreateEstimateScreen
 import com.hsgaragepecas.garagehub.ui.listorder.navigation.navigateToListOrder
 import com.hsgaragepecas.garagehub.ui.settings.navigation.navigateToSettingsScreen
 import kotlinx.serialization.Serializable
@@ -23,6 +24,7 @@ sealed class Route {
             is CreateAccount -> navController.navigateToCreateAccountScreen()
             is Settings -> navController.navigateToSettingsScreen()
             is ListOrder -> navController.navigateToListOrder()
+            is CreateEstimate -> navController.navigateToCreateEstimateScreen()
             is ForgotPassword -> TODO()
         }
     }
@@ -57,3 +59,9 @@ data object Settings : Route()
  */
 @Serializable
 data object ListOrder : Route()
+
+/**
+ * Represents the create estimate screen route.
+ */
+@Serializable
+data object CreateEstimate : Route()

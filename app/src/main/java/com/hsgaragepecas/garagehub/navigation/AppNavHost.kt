@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.hsgaragepecas.garagehub.ui.account.login.navigation.loginScreen
+import com.hsgaragepecas.garagehub.ui.estimate.navigation.createEstimateScreen
 import com.hsgaragepecas.garagehub.ui.listorder.navigation.listOrderScreen
 import com.hsgaragepecas.garagehub.ui.settings.navigation.settingsScreen
 
@@ -23,5 +24,6 @@ fun AppNavHost(
         loginScreen(navController)
         settingsScreen()
         listOrderScreen(navController)
+        createEstimateScreen(navController)
     }
 }

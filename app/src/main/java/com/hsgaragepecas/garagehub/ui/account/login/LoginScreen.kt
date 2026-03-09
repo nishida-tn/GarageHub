@@ -55,7 +55,7 @@ import com.hsgaragepecas.garagehub.ui.theme.GarageYellow
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
-    onLoginSuccess: () -> Unit,
+    onNavigateToCreateEstimate: () -> Unit,
     onForgotPasswordClick: () -> Unit,
     onCreateAccountClick: () -> Unit
 ) {
@@ -68,8 +68,8 @@ fun LoginScreen(
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { effect ->
             when (effect) {
-                is LoginContract.LoginSideEffect.NavigateToHome -> {
-                    onLoginSuccess()
+                is LoginContract.LoginSideEffect.NavigateToCreateEstimate -> {
+                    onNavigateToCreateEstimate()
                 }
                 is LoginContract.LoginSideEffect.ShowToast -> {
                     Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
@@ -282,7 +282,7 @@ private fun LoginInputField(
 private fun LoginScreenPreview() {
     GarageHubTheme(darkTheme = true) {
         LoginScreen(
-            onLoginSuccess = {},
+            onNavigateToCreateEstimate = {},
             onForgotPasswordClick = {},
             onCreateAccountClick = {},
             viewModel = hiltViewModel<LoginViewModelImpl>()

@@ -32,9 +32,9 @@ interface LoginContract {
      */
     sealed class LoginSideEffect {
         /**
-         * Navigate to the home screen.
+         * Navigate to the create estimate screen.
          */
-        object NavigateToHome : LoginSideEffect()
+        object NavigateToCreateEstimate : LoginSideEffect()
 
         /**
          * Shows a toast message.

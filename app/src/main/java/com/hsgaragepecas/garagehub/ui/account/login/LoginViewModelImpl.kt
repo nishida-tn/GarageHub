@@ -39,7 +39,7 @@ class LoginViewModelImpl @Inject constructor(
             when (val result = loginUseCase(email, password)) {
                 is Result.Success -> {
                     _uiState.update { it.copy(isLoading = false) }
-                    _sideEffect.send(LoginContract.LoginSideEffect.NavigateToHome)
+                    _sideEffect.send(LoginContract.LoginSideEffect.NavigateToCreateEstimate)
                 }
 
                 is Result.Error -> {
