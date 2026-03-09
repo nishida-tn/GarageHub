@@ -1,26 +1,26 @@
 package com.hsgaragepecas.garagehub.ui.account.login
 
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 
 /**
- * An interface for the login view model.
+ * Defines the contract for the login view model.
  */
 interface LoginViewModel {
     /**
-     * The state of the login screen.
+     * The UI state of the login screen.
      */
     val uiState: StateFlow<LoginContract.LoginUiState>
-    /**
-     * The events that can be sent from the login screen.
-     */
-    val uiEvent: Channel<LoginContract.LoginUiEvent>
 
     /**
-     * Called when the login button is clicked.
-     *
-     * @param email The email.
-     * @param password The password.
+     * The side effects of the login screen.
      */
-    fun onLoginClick(email: String, password: String)
+    val sideEffect: Flow<LoginContract.LoginSideEffect>
+
+    /**
+     * Sends an event to the view model.
+     *
+     * @param event The event to be sent.
+     */
+    fun setEvent(event: LoginContract.LoginUiEvent)
 }

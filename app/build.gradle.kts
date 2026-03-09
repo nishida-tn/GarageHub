@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.retrofit.converter.kotlinx.serialization)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
+    implementation(libs.retrofit.kotlinx.serialization.converter)
 
     kapt(libs.hilt.compiler)
     kapt(libs.hilt.android.compiler)

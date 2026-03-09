@@ -1,5 +1,6 @@
 package com.hsgaragepecas.garagehub.ui.account.login
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -19,6 +21,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -38,6 +43,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.hsgaragepecas.garagehub.R
 import com.hsgaragepecas.garagehub.ui.theme.GarageCardBackground
 import com.hsgaragepecas.garagehub.ui.theme.GarageDarkBackground
@@ -46,26 +52,34 @@ import com.hsgaragepecas.garagehub.ui.theme.GarageGreyText
 import com.hsgaragepecas.garagehub.ui.theme.GarageHubTheme
 import com.hsgaragepecas.garagehub.ui.theme.GarageYellow
 
-/**
- * A screen that allows the user to log in to the application.
- *
- * @param modifier The modifier to be applied to the screen.
- * @param onLoginClick A lambda to be called when the login button is clicked.
- * @param onForgotPasswordClick A lambda to be called when the forgot password button is clicked.
- * @param onCreateAccountClick A lambda to be called when the create account button is clicked.
- */
 @Composable
 fun LoginScreen(
-    modifier: Modifier = Modifier,
-    onLoginClick: (String, String) -> Unit = { _, _ -> },
-    onForgotPasswordClick: () -> Unit = {},
-    onCreateAccountClick: () -> Unit = {}
+    viewModel: LoginViewModel,
+    onLoginSuccess: () -> Unit,
+    onForgotPasswordClick: () -> Unit,
+    onCreateAccountClick: () -> Unit
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    LaunchedEffect(Unit) {
+        viewModel.sideEffect.collect { effect ->
+            when (effect) {
+                is LoginContract.LoginSideEffect.NavigateToHome -> {
+                    onLoginSuccess()
+                }
+                is LoginContract.LoginSideEffect.ShowToast -> {
+                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(GarageDarkBackground),
         contentAlignment = Alignment.Center
@@ -75,8 +89,7 @@ fun LoginScreen(
                 .padding(24.dp)
                 .fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            color = GarageCardBackground,
-            border = null
+            color = GarageCardBackground
         ) {
             Column(
                 modifier = Modifier
@@ -109,7 +122,8 @@ fun LoginScreen(
                     value = email,
                     onValueChange = { email = it },
                     placeholder = stringResource(R.string.email_placeholder),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    isError = uiState.error != null
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -120,13 +134,26 @@ fun LoginScreen(
                     onValueChange = { password = it },
                     placeholder = stringResource(R.string.password_placeholder),
                     visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    isError = uiState.error != null
                 )
+
+                if (uiState.error != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = uiState.error!!,
+                        color = Color.Red,
+                        fontSize = 14.sp
+                    )
+                }
+
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
-                    onClick = { onLoginClick(email, password) },
+                    onClick = {
+                        viewModel.setEvent(LoginContract.LoginUiEvent.OnLoginClick(email, password))
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
@@ -134,15 +161,20 @@ fun LoginScreen(
                         containerColor = GarageYellow,
                         contentColor = Color.Black
                     ),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
+                    enabled = !uiState.isLoading
                 ) {
-                    Text(
-                        text = stringResource(R.string.login_button),
-                        style = TextStyle(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
+                    if (uiState.isLoading) {
+                        CircularProgressIndicator(color = Color.Black)
+                    } else {
+                        Text(
+                            text = stringResource(R.string.login_button),
+                            style = TextStyle(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp
+                            )
                         )
-                    )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -180,7 +212,12 @@ fun LoginScreen(
                                 append(stringResource(R.string.no_account))
                                 append(" ")
                             }
-                            withStyle(style = SpanStyle(color = GarageYellow, fontWeight = FontWeight.Bold)) {
+                            withStyle(
+                                style = SpanStyle(
+                                    color = GarageYellow,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            ) {
                                 append(stringResource(R.string.create_account))
                             }
                         },
@@ -192,17 +229,6 @@ fun LoginScreen(
     }
 }
 
-/**
- * A composable that displays an input field for the login screen.
- *
- * @param label The label to be displayed above the input field.
- * @param value The value of the input field.
- * @param onValueChange A lambda to be called when the value of the input field changes.
- * @param placeholder The placeholder to be displayed in the input field.
- * @param modifier The modifier to be applied to the input field.
- * @param visualTransformation The visual transformation to be applied to the input field.
- * @param keyboardOptions The keyboard options to be applied to the input field.
- */
 @Composable
 private fun LoginInputField(
     label: String,
@@ -211,7 +237,8 @@ private fun LoginInputField(
     placeholder: String,
     modifier: Modifier = Modifier,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    isError: Boolean = false
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
@@ -241,10 +268,11 @@ private fun LoginInputField(
                 unfocusedTextColor = Color.White,
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
-                focusedBorderColor = GarageDivider,
-                unfocusedBorderColor = GarageDivider
+                focusedBorderColor = if (isError) Color.Red else GarageDivider,
+                unfocusedBorderColor = if (isError) Color.Red else GarageDivider
             ),
-            singleLine = true
+            singleLine = true,
+            isError = isError
         )
     }
 }
@@ -253,6 +281,11 @@ private fun LoginInputField(
 @Composable
 private fun LoginScreenPreview() {
     GarageHubTheme(darkTheme = true) {
-        LoginScreen()
+        LoginScreen(
+            onLoginSuccess = {},
+            onForgotPasswordClick = {},
+            onCreateAccountClick = {},
+            viewModel = hiltViewModel<LoginViewModelImpl>()
+        )
     }
 }

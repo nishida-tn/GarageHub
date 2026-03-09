@@ -20,10 +20,27 @@ interface LoginContract {
      */
     sealed class LoginUiEvent {
         /**
+         * The login button was clicked.
+         * @param email The email address.
+         * @param password The password.
+         */
+        data class OnLoginClick(val email: String, val password: String) : LoginUiEvent()
+    }
+
+    /**
+     * Represents an effect that can be sent from the login view model.
+     */
+    sealed class LoginSideEffect {
+        /**
+         * Navigate to the home screen.
+         */
+        object NavigateToHome : LoginSideEffect()
+
+        /**
          * Shows a toast message.
          *
          * @param message The message to be shown.
          */
-        data class ShowToast(val message: String) : LoginUiEvent()
+        data class ShowToast(val message: String) : LoginSideEffect()
     }
 }
