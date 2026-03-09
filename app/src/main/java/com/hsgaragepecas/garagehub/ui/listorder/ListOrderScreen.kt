@@ -164,14 +164,14 @@ fun OrderCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Pedido #${order.id} - ${order.timestamp}",
+                    text = "Pedido #${order.orderNumber} - ${order.orderDate}",
                     style = MaterialTheme.typography.bodySmall
                 )
                 OrderStatusChip(status = order.status)
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = order.description,
+                text = order.carBrand,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -182,16 +182,16 @@ fun OrderCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "Itens: ${order.itemCount}")
+                Text(text = "Itens: ${order.numberOfItems}")
                 Text(
-                    text = "R$ ${"%,.2f".format(order.totalValue)}",
+                    text = "R$ ${"%,.2f".format(order.price)}",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
             Button(
-                onClick = { onNavigateToOrderDetails(order.id.toString()) },
+                onClick = { onNavigateToOrderDetails(order.orderNumber.toString()) },
                 modifier = Modifier.align(Alignment.End)
             ) {
                 Text("Detalhes")

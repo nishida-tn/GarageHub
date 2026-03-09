@@ -68,6 +68,10 @@ dependencies {
     implementation(libs.hilt.work)
     implementation(libs.hilt.android)
     implementation(libs.hilt.android.navigation)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.kotlinx.serialization)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
 
     kapt(libs.hilt.compiler)
     kapt(libs.hilt.android.compiler)
