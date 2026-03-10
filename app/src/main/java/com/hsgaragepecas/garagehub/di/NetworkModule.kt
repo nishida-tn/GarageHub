@@ -31,6 +31,7 @@ object NetworkModule {
     fun provideJson(): Json {
         return Json {
             ignoreUnknownKeys = true
+            coerceInputValues = true
         }
     }
 

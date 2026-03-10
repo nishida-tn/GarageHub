@@ -40,7 +40,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hsgaragepecas.garagehub.R
-import com.hsgaragepecas.garagehub.ui.common.GarageTopAppBar
 import com.hsgaragepecas.garagehub.ui.theme.GarageDarkBackground
 import com.hsgaragepecas.garagehub.ui.theme.GarageDivider
 import com.hsgaragepecas.garagehub.ui.theme.GarageGreyText
@@ -64,8 +63,6 @@ fun CreateEstimateScreen(
             .verticalScroll(scrollState)
             .padding(16.dp)
     ) {
-        GarageTopAppBar(onMenuClick = { /*TODO*/ })
-
         Spacer(modifier = Modifier.height(32.dp))
 
         // New Estimate Section

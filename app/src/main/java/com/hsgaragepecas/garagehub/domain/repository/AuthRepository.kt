@@ -1,6 +1,7 @@
 package com.hsgaragepecas.garagehub.domain.repository
 
 import com.hsgaragepecas.garagehub.data.model.LoginResponse
+import com.hsgaragepecas.garagehub.data.model.MeResponse
 import com.hsgaragepecas.garagehub.domain.Result
 
 /**
@@ -15,4 +16,11 @@ interface AuthRepository {
      * @return A result indicating whether the login was successful.
      */
     suspend fun login(email: String, password: String): Result<LoginResponse>
+
+    /**
+     * Gets the current user's data.
+     *
+     * @return A result containing the user's data.
+     */
+    suspend fun getMe(): Result<MeResponse>
 }

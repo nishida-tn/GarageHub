@@ -5,10 +5,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.hsgaragepecas.garagehub.core.extensions.navigateTo
-import com.hsgaragepecas.garagehub.navigation.CreateEstimate
 import com.hsgaragepecas.garagehub.navigation.Login
 import com.hsgaragepecas.garagehub.ui.account.login.LoginScreen
 import com.hsgaragepecas.garagehub.ui.account.login.LoginViewModelImpl
+import com.hsgaragepecas.garagehub.ui.main.navigation.navigateToMainScreenFromLogin
 import com.hsgaragepecas.garagehub.ui.settings.navigation.navigateToSettingsScreen
 
 /**
@@ -22,8 +22,8 @@ fun NavGraphBuilder.loginScreen(
     composable<Login> {
         LoginScreen(
             viewModel = hiltViewModel<LoginViewModelImpl>(),
-            onNavigateToCreateEstimate = {
-                navController.navigateTo(CreateEstimate)
+            onNavigateToMain = {
+                navController.navigateToMainScreenFromLogin()
             },
             onForgotPasswordClick = {
                 // TODO: Navigate to forgot password screen

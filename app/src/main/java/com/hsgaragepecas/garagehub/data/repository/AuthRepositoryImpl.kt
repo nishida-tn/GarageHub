@@ -1,7 +1,10 @@
 package com.hsgaragepecas.garagehub.data.repository
 
+import com.hsgaragepecas.garagehub.data.local.user.UserPreferencesDataSource
 import com.hsgaragepecas.garagehub.data.model.LoginRequest
 import com.hsgaragepecas.garagehub.data.model.LoginResponse
+import com.hsgaragepecas.garagehub.data.model.MeResponse
+import com.hsgaragepecas.garagehub.data.model.UserPreferences
 import com.hsgaragepecas.garagehub.data.remote.AuthService
 import com.hsgaragepecas.garagehub.domain.Result
 import com.hsgaragepecas.garagehub.domain.repository.AuthRepository
@@ -14,7 +17,8 @@ import javax.inject.Inject
  * Implementation of the [AuthRepository].
  */
 class AuthRepositoryImpl @Inject constructor(
-    private val authService: AuthService
+    private val authService: AuthService,
+    private val userPreferencesDataSource: UserPreferencesDataSource
 ) : AuthRepository {
     /**
      * Logs in a user.
@@ -28,6 +32,15 @@ class AuthRepositoryImpl @Inject constructor(
         return@withContext try {
             val loginRequest = LoginRequest(email, password, "oficina")
             val response = authService.login(loginRequest)
+            userPreferencesDataSource.saveUserPreferences(
+                UserPreferences(
+                    token = response.token,
+                    uid = response.uid,
+                    name = response.name,
+                    portalAccess = response.portalAccess,
+                    subscription = response.subscription
+                )
+            )
             Result.Success(response)
         } catch (e: HttpException) {
             if (e.code() == 401) {
@@ -35,6 +48,15 @@ class AuthRepositoryImpl @Inject constructor(
             } else {
                 Result.Error(e)
             }
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    override suspend fun getMe(): Result<MeResponse> = withContext(Dispatchers.IO) {
+        return@withContext try {
+            val response = authService.getMe()
+            Result.Success(response)
         } catch (e: Exception) {
             Result.Error(e)
         }

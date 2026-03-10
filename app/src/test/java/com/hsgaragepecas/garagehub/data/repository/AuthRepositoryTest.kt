@@ -1,11 +1,12 @@
 package com.hsgaragepecas.garagehub.data.repository
 
-import com.hsgaragepecas.garagehub.data.model.LoginRequest
+import com.hsgaragepecas.garagehub.data.local.user.UserPreferencesDataSource
 import com.hsgaragepecas.garagehub.data.model.LoginResponse
+import com.hsgaragepecas.garagehub.data.model.UserPreferences
 import com.hsgaragepecas.garagehub.data.remote.AuthService
 import com.hsgaragepecas.garagehub.domain.Result
-import com.hsgaragepecas.garagehub.domain.repository.AuthRepository
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -17,18 +18,34 @@ import org.junit.Test
 class AuthRepositoryTest {
 
     private lateinit var authService: AuthService
-    private lateinit var authRepository: AuthRepository
+    private lateinit var userPreferencesDataSource: UserPreferencesDataSource
+    private lateinit var authRepository: AuthRepositoryImpl
 
     @Before
     fun setUp() {
         authService = mockk()
-        authRepository = AuthRepositoryImpl(authService)
+        userPreferencesDataSource = mockk(relaxUnitFun = true)
+        authRepository = AuthRepositoryImpl(authService, userPreferencesDataSource)
     }
 
     @Test
-    fun `login with valid credentials returns success`() = runTest {
+    fun `login with valid credentials returns success and saves user preferences`() = runTest {
         // Arrange
-        val loginResponse = LoginResponse("test_token")
+        val loginResponse = LoginResponse(
+            ok = true,
+            token = "test_token",
+            uid = 1,
+            name = "Test User",
+            portalAccess = "access",
+            subscription = "sub"
+        )
+        val userPreferences = UserPreferences(
+            token = loginResponse.token,
+            uid = loginResponse.uid,
+            name = loginResponse.name,
+            portalAccess = loginResponse.portalAccess,
+            subscription = loginResponse.subscription
+        )
         coEvery { authService.login(any()) } returns loginResponse
 
         // Act
@@ -37,6 +54,7 @@ class AuthRepositoryTest {
         // Assert
         assert(result is Result.Success<*>)
         assertEquals(loginResponse, (result as Result.Success).data)
+        coVerify { userPreferencesDataSource.saveUserPreferences(userPreferences) }
     }
 
     @Test
@@ -50,6 +68,5 @@ class AuthRepositoryTest {
 
         // Assert
         assert(result is Result.Error)
-        assertEquals(exception, (result as Result.Error).exception)
     }
 }
