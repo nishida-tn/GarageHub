@@ -42,7 +42,7 @@ private val LightColorScheme = lightColorScheme(
  */
 @Composable
 fun GarageHubTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = true,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
