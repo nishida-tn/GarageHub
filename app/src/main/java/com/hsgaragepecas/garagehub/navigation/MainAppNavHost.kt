@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import com.hsgaragepecas.garagehub.ui.estimate.navigation.createEstimateScreen
 import com.hsgaragepecas.garagehub.ui.listorder.navigation.listOrderScreen
 import com.hsgaragepecas.garagehub.ui.settings.navigation.settingsScreen
@@ -27,6 +28,6 @@ fun MainAppNavHost(
     ) {
         listOrderScreen(navController)
         createEstimateScreen(navController)
-        settingsScreen()
+        settingsScreen(navController)
     }
 }

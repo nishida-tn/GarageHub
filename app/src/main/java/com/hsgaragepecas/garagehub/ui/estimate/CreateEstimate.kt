@@ -1,7 +1,6 @@
 package com.hsgaragepecas.garagehub.ui.estimate
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +20,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
@@ -40,7 +40,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hsgaragepecas.garagehub.R
-import com.hsgaragepecas.garagehub.ui.theme.GarageDarkBackground
 import com.hsgaragepecas.garagehub.ui.theme.GarageDivider
 import com.hsgaragepecas.garagehub.ui.theme.GarageGreyText
 import com.hsgaragepecas.garagehub.ui.theme.GarageHubTheme
@@ -55,210 +54,316 @@ import com.hsgaragepecas.garagehub.ui.theme.GarageYellow
 fun CreateEstimateScreen(
 ) {
     val scrollState = rememberScrollState()
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(GarageDarkBackground)
-            .verticalScroll(scrollState)
-            .padding(16.dp)
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
     ) {
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // New Estimate Section
-        Text(
-            text = stringResource(R.string.new_estimate_title),
-            style = TextStyle(
-                color = Color.White,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
-            )
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            EstimateInputField(
-                label = stringResource(R.string.mo_hour_value_label),
-                value = "80,00",
-                onValueChange = {},
-                modifier = Modifier.weight(1f)
-            )
-            EstimateInputField(
-                label = stringResource(R.string.painting_hour_value_label),
-                value = "100,00",
-                onValueChange = {},
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = { },
-            colors = ButtonDefaults.buttonColors(containerColor = GarageYellow),
-            shape = RoundedCornerShape(8.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .padding(16.dp)
         ) {
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // New Estimate Section
             Text(
-                text = stringResource(R.string.save_values_button),
-                color = Color.Black,
-                fontWeight = FontWeight.Bold
+                text = stringResource(R.string.new_estimate_title),
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onBackground
             )
-        }
 
-        Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        // Customer Data Section
-        EstimateSectionHeader(title = stringResource(R.string.customer_data_section))
-
-        EstimateInputField(label = stringResource(R.string.customer_name_label), value = "", onValueChange = {})
-        Spacer(modifier = Modifier.height(12.dp))
-        EstimateInputField(label = stringResource(R.string.customer_tel_label), value = "", onValueChange = {})
-        Spacer(modifier = Modifier.height(12.dp))
-        EstimateInputField(label = stringResource(R.string.customer_whatsapp_label), value = "", onValueChange = {})
-        Spacer(modifier = Modifier.height(12.dp))
-        EstimateInputField(label = stringResource(R.string.customer_cep_label), value = "", onValueChange = {})
-        Spacer(modifier = Modifier.height(12.dp))
-        EstimateInputField(label = stringResource(R.string.customer_address_label), value = "", onValueChange = {})
-        Spacer(modifier = Modifier.height(12.dp))
-        EstimateInputField(label = stringResource(R.string.customer_number_label), value = "", onValueChange = {})
-        Spacer(modifier = Modifier.height(12.dp))
-        EstimateInputField(label = stringResource(R.string.customer_neighborhood_label), value = "", onValueChange = {})
-        Spacer(modifier = Modifier.height(12.dp))
-        EstimateInputField(label = stringResource(R.string.customer_city_label), value = "", onValueChange = {})
-        Spacer(modifier = Modifier.height(12.dp))
-        EstimateInputField(label = stringResource(R.string.customer_uf_label), value = "", onValueChange = {})
-        Spacer(modifier = Modifier.height(12.dp))
-        EstimateInputField(label = stringResource(R.string.customer_complement_label), value = "", onValueChange = {})
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Vehicle Data Section
-        EstimateSectionHeader(title = stringResource(R.string.vehicle_data_section))
-
-        EstimateInputField(label = stringResource(R.string.vehicle_plate_label), value = "", onValueChange = {})
-        Spacer(modifier = Modifier.height(12.dp))
-        EstimateDropdownField(label = stringResource(R.string.vehicle_brand_label), selectedOption = stringResource(R.string.select_option))
-        Spacer(modifier = Modifier.height(12.dp))
-        EstimateDropdownField(label = stringResource(R.string.vehicle_model_label), selectedOption = stringResource(R.string.select_brand_option))
-        Spacer(modifier = Modifier.height(12.dp))
-        EstimateDropdownField(label = stringResource(R.string.vehicle_manufacturing_year_label), selectedOption = stringResource(R.string.select_model_option))
-        Spacer(modifier = Modifier.height(12.dp))
-        EstimateDropdownField(label = stringResource(R.string.vehicle_model_year_label), selectedOption = stringResource(R.string.select_model_option))
-        Spacer(modifier = Modifier.height(12.dp))
-        EstimateInputField(label = stringResource(R.string.vehicle_chassis_label), value = "", onValueChange = {})
-        Spacer(modifier = Modifier.height(12.dp))
-        EstimateDropdownField(label = stringResource(R.string.vehicle_fuel_label), selectedOption = stringResource(R.string.select_option))
-        Spacer(modifier = Modifier.height(12.dp))
-        EstimateDropdownField(label = stringResource(R.string.vehicle_air_conditioning_label), selectedOption = stringResource(R.string.select_option))
-        Spacer(modifier = Modifier.height(12.dp))
-        EstimateDropdownField(label = stringResource(R.string.vehicle_steering_label), selectedOption = stringResource(R.string.select_option))
-        Spacer(modifier = Modifier.height(12.dp))
-        EstimateDropdownField(label = stringResource(R.string.vehicle_transmission_label), selectedOption = stringResource(R.string.select_option))
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = stringResource(R.string.vehicle_photos_label),
-            style = TextStyle(color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Surface(
-                modifier = Modifier.weight(1f),
-                color = Color.Black,
-                shape = RoundedCornerShape(4.dp),
-                border = BorderStroke(1.dp, GarageDivider)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Row(
-                    modifier = Modifier.padding(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                EstimateInputField(
+                    label = stringResource(R.string.mo_hour_value_label),
+                    value = "80,00",
+                    onValueChange = {},
+                    modifier = Modifier.weight(1f)
+                )
+                EstimateInputField(
+                    label = stringResource(R.string.painting_hour_value_label),
+                    value = "100,00",
+                    onValueChange = {},
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = { },
+                colors = ButtonDefaults.buttonColors(containerColor = GarageYellow),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.save_values_button),
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Customer Data Section
+            EstimateSectionHeader(title = stringResource(R.string.customer_data_section))
+
+            EstimateInputField(
+                label = stringResource(R.string.customer_name_label),
+                value = "",
+                onValueChange = {})
+            Spacer(modifier = Modifier.height(12.dp))
+            EstimateInputField(
+                label = stringResource(R.string.customer_tel_label),
+                value = "",
+                onValueChange = {})
+            Spacer(modifier = Modifier.height(12.dp))
+            EstimateInputField(
+                label = stringResource(R.string.customer_whatsapp_label),
+                value = "",
+                onValueChange = {})
+            Spacer(modifier = Modifier.height(12.dp))
+            EstimateInputField(
+                label = stringResource(R.string.customer_cep_label),
+                value = "",
+                onValueChange = {})
+            Spacer(modifier = Modifier.height(12.dp))
+            EstimateInputField(
+                label = stringResource(R.string.customer_address_label),
+                value = "",
+                onValueChange = {})
+            Spacer(modifier = Modifier.height(12.dp))
+            EstimateInputField(
+                label = stringResource(R.string.customer_number_label),
+                value = "",
+                onValueChange = {})
+            Spacer(modifier = Modifier.height(12.dp))
+            EstimateInputField(
+                label = stringResource(R.string.customer_neighborhood_label),
+                value = "",
+                onValueChange = {})
+            Spacer(modifier = Modifier.height(12.dp))
+            EstimateInputField(
+                label = stringResource(R.string.customer_city_label),
+                value = "",
+                onValueChange = {})
+            Spacer(modifier = Modifier.height(12.dp))
+            EstimateInputField(
+                label = stringResource(R.string.customer_uf_label),
+                value = "",
+                onValueChange = {})
+            Spacer(modifier = Modifier.height(12.dp))
+            EstimateInputField(
+                label = stringResource(R.string.customer_complement_label),
+                value = "",
+                onValueChange = {})
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Vehicle Data Section
+            EstimateSectionHeader(title = stringResource(R.string.vehicle_data_section))
+
+            EstimateInputField(
+                label = stringResource(R.string.vehicle_plate_label),
+                value = "",
+                onValueChange = {})
+            Spacer(modifier = Modifier.height(12.dp))
+            EstimateDropdownField(
+                label = stringResource(R.string.vehicle_brand_label),
+                selectedOption = stringResource(R.string.select_option)
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            EstimateDropdownField(
+                label = stringResource(R.string.vehicle_model_label),
+                selectedOption = stringResource(R.string.select_brand_option)
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            EstimateDropdownField(
+                label = stringResource(R.string.vehicle_manufacturing_year_label),
+                selectedOption = stringResource(R.string.select_model_option)
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            EstimateDropdownField(
+                label = stringResource(R.string.vehicle_model_year_label),
+                selectedOption = stringResource(R.string.select_model_option)
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            EstimateInputField(
+                label = stringResource(R.string.vehicle_chassis_label),
+                value = "",
+                onValueChange = {})
+            Spacer(modifier = Modifier.height(12.dp))
+            EstimateDropdownField(
+                label = stringResource(R.string.vehicle_fuel_label),
+                selectedOption = stringResource(R.string.select_option)
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            EstimateDropdownField(
+                label = stringResource(R.string.vehicle_air_conditioning_label),
+                selectedOption = stringResource(R.string.select_option)
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            EstimateDropdownField(
+                label = stringResource(R.string.vehicle_steering_label),
+                selectedOption = stringResource(R.string.select_option)
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            EstimateDropdownField(
+                label = stringResource(R.string.vehicle_transmission_label),
+                selectedOption = stringResource(R.string.select_option)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = stringResource(R.string.vehicle_photos_label),
+                style = TextStyle(
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(
+                    modifier = Modifier.weight(1f),
+                    color = MaterialTheme.colorScheme.surface,
+                    shape = RoundedCornerShape(4.dp),
+                    border = BorderStroke(1.dp, GarageDivider)
                 ) {
-                    Button(
-                        onClick = {},
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                        shape = RoundedCornerShape(2.dp),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                        modifier = Modifier.height(24.dp)
+                    Row(
+                        modifier = Modifier.padding(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = stringResource(R.string.choose_files_button), color = Color.Black, fontSize = 12.sp)
+                        Button(
+                            onClick = {},
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                            shape = RoundedCornerShape(2.dp),
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                            modifier = Modifier.height(24.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.choose_files_button),
+                                color = Color.Black,
+                                fontSize = 12.sp
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.no_file_chosen),
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 12.sp
+                        )
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = stringResource(R.string.no_file_chosen), color = Color.White, fontSize = 12.sp)
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Surface(
+                    modifier = Modifier.size(40.dp),
+                    color = GarageDivider,
+                    shape = RoundedCornerShape(4.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Box(
+                            modifier = Modifier
+                                .size(24.dp)
+                        ) // Placeholder for camera icon
+                    }
                 }
             }
-            Spacer(modifier = Modifier.width(8.dp))
-            Surface(
-                modifier = Modifier.size(40.dp),
-                color = GarageDivider,
-                shape = RoundedCornerShape(4.dp)
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Box(modifier = Modifier.size(24.dp).background(Color.Gray)) // Placeholder for camera icon
-                }
-            }
-        }
 
-        Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-        // Items / Services Section
-        EstimateSectionHeader(title = stringResource(R.string.items_services_section))
+            // Items / Services Section
+            EstimateSectionHeader(title = stringResource(R.string.items_services_section))
 
-        EstimateInputField(label = stringResource(R.string.item_genuine_code_label), value = "", onValueChange = {})
-        Spacer(modifier = Modifier.height(12.dp))
-        EstimateInputField(
-            label = stringResource(R.string.item_part_label),
-            value = "",
-            onValueChange = {},
-            placeholder = stringResource(R.string.item_part_placeholder)
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-
-        ItemCheckBoxWithInput(label = stringResource(R.string.item_t_h_label))
-        ItemCheckBoxWithInput(label = stringResource(R.string.item_ri_h_label))
-        ItemCheckBoxWithInput(label = stringResource(R.string.item_r_h_label))
-        ItemCheckBoxWithInput(label = stringResource(R.string.item_p_h_label))
-
-        Spacer(modifier = Modifier.height(12.dp))
-        EstimateInputField(label = stringResource(R.string.item_part_price_label), value = "0,00", onValueChange = {})
-        Spacer(modifier = Modifier.height(12.dp))
-        EstimateInputField(label = stringResource(R.string.item_total_label), value = "", onValueChange = {})
-
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = { },
-            colors = ButtonDefaults.buttonColors(containerColor = GarageYellow),
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.align(Alignment.End)
-        ) {
-            Text(text = stringResource(R.string.add_button), color = Color.Black, fontWeight = FontWeight.Bold)
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Final Buttons
-        Button(
-            onClick = { },
-            colors = ButtonDefaults.buttonColors(containerColor = GarageYellow),
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.fillMaxWidth().height(48.dp)
-        ) {
-            Text(text = stringResource(R.string.save_estimate_button), color = Color.Black, fontWeight = FontWeight.Bold)
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            ActionButton(text = stringResource(R.string.generate_pdf_button), modifier = Modifier.weight(1f))
-            ActionButton(text = stringResource(R.string.send_whatsapp_button), modifier = Modifier.weight(1.3f))
-            ActionButton(
-                text = stringResource(R.string.demand_button),
-                modifier = Modifier.weight(1f),
-                containerColor = Color(0xFF0D6EFD)
+            EstimateInputField(
+                label = stringResource(R.string.item_genuine_code_label),
+                value = "",
+                onValueChange = {})
+            Spacer(modifier = Modifier.height(12.dp))
+            EstimateInputField(
+                label = stringResource(R.string.item_part_label),
+                value = "",
+                onValueChange = {},
+                placeholder = stringResource(R.string.item_part_placeholder)
             )
-        }
+            Spacer(modifier = Modifier.height(12.dp))
 
-        Spacer(modifier = Modifier.height(32.dp))
+            ItemCheckBoxWithInput(label = stringResource(R.string.item_t_h_label))
+            ItemCheckBoxWithInput(label = stringResource(R.string.item_ri_h_label))
+            ItemCheckBoxWithInput(label = stringResource(R.string.item_r_h_label))
+            ItemCheckBoxWithInput(label = stringResource(R.string.item_p_h_label))
+
+            Spacer(modifier = Modifier.height(12.dp))
+            EstimateInputField(
+                label = stringResource(R.string.item_part_price_label),
+                value = "0,00",
+                onValueChange = {})
+            Spacer(modifier = Modifier.height(12.dp))
+            EstimateInputField(
+                label = stringResource(R.string.item_total_label),
+                value = "",
+                onValueChange = {})
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = { },
+                colors = ButtonDefaults.buttonColors(containerColor = GarageYellow),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.align(Alignment.End)
+            ) {
+                Text(
+                    text = stringResource(R.string.add_button),
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Final Buttons
+            Button(
+                onClick = { },
+                colors = ButtonDefaults.buttonColors(containerColor = GarageYellow),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.save_estimate_button),
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                ActionButton(
+                    text = stringResource(R.string.generate_pdf_button),
+                    modifier = Modifier.weight(1f)
+                )
+                ActionButton(
+                    text = stringResource(R.string.send_whatsapp_button),
+                    modifier = Modifier.weight(1.3f)
+                )
+                ActionButton(
+                    text = stringResource(R.string.demand_button),
+                    modifier = Modifier.weight(1f),
+                    containerColor = Color(0xFF0D6EFD)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+        }
     }
 }
 
@@ -272,11 +377,8 @@ private fun EstimateSectionHeader(title: String) {
     Column {
         Text(
             text = title,
-            style = TextStyle(
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(16.dp))
     }
@@ -302,11 +404,9 @@ private fun EstimateInputField(
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = label,
-            style = TextStyle(
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+            fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
@@ -316,10 +416,10 @@ private fun EstimateInputField(
             placeholder = placeholder?.let { { Text(text = it, color = GarageGreyText) } },
             shape = RoundedCornerShape(8.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White,
-                focusedContainerColor = Color.Black,
-                unfocusedContainerColor = Color.Black,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                 focusedBorderColor = GarageDivider,
                 unfocusedBorderColor = GarageDivider
             ),
@@ -344,16 +444,14 @@ private fun EstimateDropdownField(
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = label,
-            style = TextStyle(
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+            fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.surface,
             shape = RoundedCornerShape(8.dp),
             border = BorderStroke(1.dp, GarageDivider)
         ) {
@@ -362,8 +460,8 @@ private fun EstimateDropdownField(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = selectedOption, color = Color.White)
-                Text(text = "▼", color = Color.White, fontSize = 10.sp)
+                Text(text = selectedOption, color = MaterialTheme.colorScheme.onSurface)
+                Text(text = "▼", color = MaterialTheme.colorScheme.onSurface, fontSize = 10.sp)
             }
         }
     }
@@ -383,23 +481,29 @@ private fun ItemCheckBoxWithInput(label: String) {
                 checked = checked,
                 onCheckedChange = { checked = it },
                 colors = CheckboxDefaults.colors(
-                    checkedColor = Color.White,
-                    uncheckedColor = Color.White,
-                    checkmarkColor = Color.Black
+                    checkedColor = MaterialTheme.colorScheme.onBackground,
+                    uncheckedColor = MaterialTheme.colorScheme.onBackground,
+                    checkmarkColor = MaterialTheme.colorScheme.background
                 )
             )
-            Text(text = label, color = Color.White, fontWeight = FontWeight.Bold)
+            Text(
+                text = label,
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.Bold
+            )
         }
         OutlinedTextField(
             value = "",
             onValueChange = {},
-            modifier = Modifier.fillMaxWidth().padding(start = 12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 12.dp),
             shape = RoundedCornerShape(8.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White,
-                focusedContainerColor = Color.Black,
-                unfocusedContainerColor = Color.Black,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                 focusedBorderColor = GarageDivider,
                 unfocusedBorderColor = GarageDivider
             ),
@@ -436,6 +540,14 @@ private fun ActionButton(
 @Preview(showBackground = true)
 @Composable
 private fun CreateEstimateScreenPreview() {
+    GarageHubTheme(darkTheme = false) {
+        CreateEstimateScreen()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CreateEstimateScreenDarkPreview() {
     GarageHubTheme(darkTheme = true) {
         CreateEstimateScreen()
     }
