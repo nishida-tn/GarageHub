@@ -1,16 +1,16 @@
 package com.hsgaragepecas.garagehub.domain.usecase
 
+import com.hsgaragepecas.garagehub.data.local.user.UserPreferencesDataSource
 import com.hsgaragepecas.garagehub.domain.Result
 import com.hsgaragepecas.garagehub.domain.repository.AuthRepository
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class CheckAuthStatusUseCase @Inject constructor(
-    private val authRepository: AuthRepository
+    private val userPreferencesDataSource: UserPreferencesDataSource
 ) {
     suspend operator fun invoke(): Result<Boolean> {
-        return when (val result = authRepository.getMe()) {
-            is Result.Success -> Result.Success(true)
-            is Result.Error -> Result.Success(false)
-        }
+        val userPreferences = userPreferencesDataSource.userPreferences.first()
+        return Result.Success(!userPreferences.token.isNullOrEmpty())
     }
 }
