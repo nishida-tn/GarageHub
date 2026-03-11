@@ -131,4 +131,8 @@ interface SettingsViewModel {
      * Saves the hourly rates.
      */
     fun saveHourlyRates()
+    /**
+     * Logs the user out.
+     */
+    fun logout()
 }

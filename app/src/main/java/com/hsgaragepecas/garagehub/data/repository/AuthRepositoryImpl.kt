@@ -61,4 +61,8 @@ class AuthRepositoryImpl @Inject constructor(
             Result.Error(e)
         }
     }
+
+    override suspend fun logout() {
+        userPreferencesDataSource.clear()
+    }
 }

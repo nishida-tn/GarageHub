@@ -23,4 +23,9 @@ interface AuthRepository {
      * @return A result containing the user's data.
      */
     suspend fun getMe(): Result<MeResponse>
+
+    /**
+     * Logs out the current user.
+     */
+    suspend fun logout()
 }

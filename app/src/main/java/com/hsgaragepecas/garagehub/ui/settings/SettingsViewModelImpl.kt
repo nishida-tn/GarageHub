@@ -3,6 +3,7 @@ package com.hsgaragepecas.garagehub.ui.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hsgaragepecas.garagehub.domain.usecases.CheckPasswordUseCase
+import com.hsgaragepecas.garagehub.domain.usecases.LogoutUseCase
 import com.hsgaragepecas.garagehub.domain.usecases.SaveHourlyRatesUseCase
 import com.hsgaragepecas.garagehub.domain.usecases.SaveSettingsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,12 +21,14 @@ import javax.inject.Inject
  * @param saveSettingsUseCase The use case for saving the settings.
  * @param checkPasswordUseCase The use case for checking the password.
  * @param saveHourlyRatesUseCase The use case for saving the hourly rates.
+ * @param logoutUseCase The use case for logging out.
  */
 @HiltViewModel
 class SettingsViewModelImpl @Inject constructor(
     private val saveSettingsUseCase: SaveSettingsUseCase,
     private val checkPasswordUseCase: CheckPasswordUseCase,
-    private val saveHourlyRatesUseCase: SaveHourlyRatesUseCase
+    private val saveHourlyRatesUseCase: SaveHourlyRatesUseCase,
+    private val logoutUseCase: LogoutUseCase
 ) : ViewModel(), SettingsViewModel {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -180,6 +183,13 @@ class SettingsViewModelImpl @Inject constructor(
                     _uiState.update { it.copy(isRatesSaved = false, ratesError = errorMessage) }
                 }
             }
+        }
+    }
+
+    override fun logout() {
+        viewModelScope.launch {
+            logoutUseCase()
+            uiEvent.send(SettingsUiEvent.NavigateToLogin)
         }
     }
 }

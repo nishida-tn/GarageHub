@@ -118,4 +118,9 @@ sealed class SettingsUiEvent {
      * @param message The message to be shown.
      */
     data class ShowToast(val message: String) : SettingsUiEvent()
+
+    /**
+     * Navigates to the login screen.
+     */
+    data object NavigateToLogin : SettingsUiEvent()
 }

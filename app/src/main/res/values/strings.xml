@@ -103,4 +103,5 @@
     <string name="current_password_placeholder">Senha atual</string>
     <string name="new_password_placeholder">Nova senha</string>
     <string name="confirm_password_placeholder_settings">Repita a nova senha</string>
+    <string name="logout_button">Logout</string>
 </resources>

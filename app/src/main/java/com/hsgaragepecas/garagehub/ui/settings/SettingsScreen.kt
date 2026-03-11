@@ -73,6 +73,14 @@ fun SettingsScreen(
                 is SettingsUiEvent.ShowToast -> {
                     Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
                 }
+
+                is SettingsUiEvent.NavigateToLogin -> {
+                    navController.navigate("login") {
+                        popUpTo(navController.graph.id) {
+                            inclusive = true
+                        }
+                    }
+                }
             }
         }
     }
@@ -113,6 +121,14 @@ fun SettingsScreen(
             SecuritySection(uiState = uiState, viewModel = viewModel)
             Spacer(modifier = Modifier.height(24.dp))
             LaborSection(uiState = uiState, viewModel = viewModel)
+            Spacer(modifier = Modifier.height(24.dp))
+            Button(
+                onClick = viewModel::logout,
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = stringResource(R.string.logout_button), color = MaterialTheme.colorScheme.onError)
+            }
         }
     }
 }
@@ -504,6 +520,7 @@ private fun SettingsScreenPreview() {
         override fun saveWorkshopData() {}
         override fun changePassword() {}
         override fun saveHourlyRates() {}
+        override fun logout() {}
     }
     GarageHubTheme(darkTheme = false) {
         SettingsScreen(viewModel = mockViewModel, navController = rememberNavController())
@@ -552,6 +569,7 @@ private fun SettingsScreenDarkPreview() {
         override fun saveWorkshopData() {}
         override fun changePassword() {}
         override fun saveHourlyRates() {}
+        override fun logout() {}
     }
     GarageHubTheme(darkTheme = true) {
         SettingsScreen(viewModel = mockViewModel, navController = rememberNavController())
