@@ -1,7 +1,9 @@
 package com.hsgaragepecas.garagehub.data.remote
 
+import com.hsgaragepecas.garagehub.data.model.EstimateDetailResponse
 import com.hsgaragepecas.garagehub.data.model.EstimateListResponse
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 /**
@@ -25,4 +27,15 @@ interface EstimateService {
         @Query("page") page: Int = 1,
         @Query("page_size") pageSize: Int = 20
     ): EstimateListResponse
+
+    /**
+     * Gets the details of an estimate.
+     *
+     * @param estimateId The ID of the estimate.
+     * @return The estimate detail response.
+     */
+    @GET("oficina/orcamentos/{orc_id}")
+    suspend fun getEstimateDetail(
+        @Path("orc_id") estimateId: Int
+    ): EstimateDetailResponse
 }

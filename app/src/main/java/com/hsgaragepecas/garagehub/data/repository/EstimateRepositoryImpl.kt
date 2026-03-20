@@ -1,5 +1,6 @@
 package com.hsgaragepecas.garagehub.data.repository
 
+import com.hsgaragepecas.garagehub.data.model.EstimateDetailResponse
 import com.hsgaragepecas.garagehub.data.model.EstimateListResponse
 import com.hsgaragepecas.garagehub.data.remote.EstimateService
 import com.hsgaragepecas.garagehub.domain.repository.EstimateRepository
@@ -21,5 +22,9 @@ class EstimateRepositoryImpl @Inject constructor(
         pageSize: Int
     ): EstimateListResponse {
         return estimateService.getEstimates(status, query, page, pageSize)
+    }
+
+    override suspend fun getEstimateDetail(estimateId: Int): EstimateDetailResponse {
+        return estimateService.getEstimateDetail(estimateId)
     }
 }

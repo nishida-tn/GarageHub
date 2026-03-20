@@ -31,3 +31,6 @@ data object ListEstimate : AppNavigation()
 
 @Serializable
 data object CreateEstimate : AppNavigation()
+
+@Serializable
+data class EditEstimate(val estimateId: Int) : AppNavigation()

@@ -4,6 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import com.hsgaragepecas.garagehub.navigation.EditEstimate
 import com.hsgaragepecas.garagehub.navigation.ListEstimate
 import com.hsgaragepecas.garagehub.ui.estimate.list.ListEstimateScreen
 
@@ -30,7 +31,7 @@ fun NavGraphBuilder.listEstimateScreen(
                 navController.navigate(com.hsgaragepecas.garagehub.navigation.CreateEstimate)
             },
             onNavigateToEstimateDetails = { orcId ->
-                // TODO: Navigate to estimate details
+                navController.navigate(EditEstimate(orcId))
             }
         )
     }
