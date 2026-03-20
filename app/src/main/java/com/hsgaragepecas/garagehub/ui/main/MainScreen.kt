@@ -39,6 +39,7 @@ fun MainScreen() {
 private fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
         BottomNavItem.ListOrder,
+        BottomNavItem.ListEstimate,
         BottomNavItem.CreateEstimate,
         BottomNavItem.Settings,
     )

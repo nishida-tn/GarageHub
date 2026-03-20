@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
@@ -28,11 +29,20 @@ sealed class BottomNavItem(
     )
 
     /**
+     * Represents the List Estimate screen item in the bottom navigation bar.
+     */
+    data object ListEstimate : BottomNavItem(
+        route = com.hsgaragepecas.garagehub.navigation.ListEstimate,
+        title = "Orçamentos",
+        icon = Icons.Default.Search
+    )
+
+    /**
      * Represents the Create Estimate screen item in the bottom navigation bar.
      */
     data object CreateEstimate : BottomNavItem(
         route = com.hsgaragepecas.garagehub.navigation.CreateEstimate,
-        title = "Orçamentos",
+        title = "Cria Novo",
         icon = Icons.Default.Build
     )
 
