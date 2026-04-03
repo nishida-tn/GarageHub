@@ -3,6 +3,7 @@ package com.hsgaragepecas.garagehub.di
 import com.hsgaragepecas.garagehub.data.local.user.UserPreferencesDataSource
 import com.hsgaragepecas.garagehub.data.remote.AuthService
 import com.hsgaragepecas.garagehub.data.remote.EstimateService
+import com.hsgaragepecas.garagehub.data.remote.ViaCepService
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -23,6 +24,7 @@ import javax.inject.Singleton
 object NetworkModule {
 
     private const val BASE_URL = "https://oficina.hsgaragepecas.com.br/api/"
+    private const val VIACEP_BASE_URL = "https://viacep.com.br/ws/"
 
     @Provides
     @Singleton
@@ -80,5 +82,16 @@ object NetworkModule {
     @Singleton
     fun provideEstimateService(retrofit: Retrofit): EstimateService {
         return retrofit.create(EstimateService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideViaCepService(json: Json): ViaCepService {
+        val contentType = "application/json".toMediaType()
+        return Retrofit.Builder()
+            .baseUrl(VIACEP_BASE_URL)
+            .addConverterFactory(json.asConverterFactory(contentType))
+            .build()
+            .create(ViaCepService::class.java)
     }
 }

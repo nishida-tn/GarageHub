@@ -2,11 +2,13 @@ package com.hsgaragepecas.garagehub.ui.estimate
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hsgaragepecas.garagehub.data.remote.ViaCepService
 import com.hsgaragepecas.garagehub.domain.repository.EstimateRepository
 import com.hsgaragepecas.garagehub.ui.estimate.CreateEstimateContract.CreateEstimateUiEvent
 import com.hsgaragepecas.garagehub.ui.estimate.CreateEstimateContract.CreateEstimateUiIntent
 import com.hsgaragepecas.garagehub.ui.estimate.CreateEstimateContract.CreateEstimateUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +24,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class CreateEstimateViewModel @Inject constructor(
-    private val estimateRepository: EstimateRepository
+    private val estimateRepository: EstimateRepository,
+    private val viaCepService: ViaCepService
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreateEstimateUiState())
@@ -30,6 +33,8 @@ class CreateEstimateViewModel @Inject constructor(
 
     private val _uiEvent = Channel<CreateEstimateUiEvent>(Channel.BUFFERED)
     val uiEvent = _uiEvent.receiveAsFlow()
+
+    private var fetchAddressJob: Job? = null
 
     /**
      * Handles user intents and updates the UI state accordingly.
@@ -43,7 +48,15 @@ class CreateEstimateViewModel @Inject constructor(
             is CreateEstimateUiIntent.OnClientNameChange -> _uiState.update { it.copy(clientName = intent.value) }
             is CreateEstimateUiIntent.OnClientTelChange -> _uiState.update { it.copy(clientTel = intent.value) }
             is CreateEstimateUiIntent.OnClientWhatsChange -> _uiState.update { it.copy(clientWhats = intent.value) }
-            is CreateEstimateUiIntent.OnClientCepChange -> _uiState.update { it.copy(clientCep = intent.value) }
+            is CreateEstimateUiIntent.OnClientCepChange -> {
+                val cep = intent.value.replace(Regex("\\D"), "")
+                _uiState.update { it.copy(clientCep = intent.value) }
+                if (cep.length == 8) {
+                    fetchAddress(cep)
+                } else {
+                    cancelFetchAndClearAddress()
+                }
+            }
             is CreateEstimateUiIntent.OnClientAddressChange -> _uiState.update { it.copy(clientAddress = intent.value) }
             is CreateEstimateUiIntent.OnClientNumberChange -> _uiState.update { it.copy(clientNumber = intent.value) }
             is CreateEstimateUiIntent.OnClientNeighborhoodChange -> _uiState.update { it.copy(clientNeighborhood = intent.value) }
@@ -71,11 +84,43 @@ class CreateEstimateViewModel @Inject constructor(
         }
     }
 
+    private fun fetchAddress(cep: String) {
+        fetchAddressJob?.cancel()
+        fetchAddressJob = viewModelScope.launch {
+            try {
+                val response = viaCepService.getAddress(cep)
+                if (response.erro != true) {
+                    _uiState.update {
+                        it.copy(
+                            clientAddress = response.logradouro ?: "",
+                            clientNeighborhood = response.bairro ?: "",
+                            clientCity = response.localidade ?: "",
+                            clientUf = response.uf ?: ""
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                // Handle error or silent catch as in JS snippet
+            }
+        }
+    }
+
+    private fun cancelFetchAndClearAddress() {
+        fetchAddressJob?.cancel()
+        _uiState.update {
+            it.copy(
+                clientAddress = "",
+                clientNeighborhood = "",
+                clientCity = "",
+                clientUf = ""
+            )
+        }
+    }
+
     private fun saveEstimate() {
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true) }
             // Implementation for saving estimate will go here
-            // For now, just a mock success
             _uiState.update { it.copy(isSaving = false) }
             _uiEvent.send(CreateEstimateUiEvent.ShowToast("Estimate created successfully"))
             _uiEvent.send(CreateEstimateUiEvent.NavigateBack)
