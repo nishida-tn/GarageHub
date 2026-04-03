@@ -1,8 +1,11 @@
 package com.hsgaragepecas.garagehub.data.remote
 
+import com.hsgaragepecas.garagehub.data.model.ForgotPasswordRequest
 import com.hsgaragepecas.garagehub.data.model.LoginRequest
 import com.hsgaragepecas.garagehub.data.model.LoginResponse
 import com.hsgaragepecas.garagehub.data.model.MeResponse
+import com.hsgaragepecas.garagehub.data.model.ResetPasswordRequest
+import com.hsgaragepecas.garagehub.data.model.SignupRequest
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -20,6 +23,33 @@ interface AuthService {
      */
     @POST("auth/login")
     suspend fun login(@Body request: LoginRequest): LoginResponse
+
+    /**
+     * Signs up a new user.
+     *
+     * @param request The signup request.
+     * @return A map indicating success.
+     */
+    @POST("auth/signup")
+    suspend fun signup(@Body request: SignupRequest): Map<String, Boolean>
+
+    /**
+     * Requests a password reset email.
+     *
+     * @param request The forgot password request.
+     * @return A map indicating success.
+     */
+    @POST("auth/forgot-password")
+    suspend fun forgotPassword(@Body request: ForgotPasswordRequest): Map<String, Any>
+
+    /**
+     * Resets the user's password using a token.
+     *
+     * @param request The reset password request.
+     * @return A map indicating success.
+     */
+    @POST("auth/reset-password")
+    suspend fun resetPassword(@Body request: ResetPasswordRequest): Map<String, Any>
 
     /**
      * Gets the current user's data.

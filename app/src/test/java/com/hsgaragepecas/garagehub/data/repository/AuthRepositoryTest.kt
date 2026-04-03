@@ -11,6 +11,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -51,7 +52,7 @@ class AuthRepositoryTest {
         val result = authRepository.login("test@example.com", "password")
 
         // Assert
-        assert(result is Result.Success<*>)
+        assertTrue(result is Result.Success)
         assertEquals(loginResponse, (result as Result.Success).data)
         coVerify { userPreferencesDataSource.saveUserPreferences(userPreferences) }
     }
@@ -66,6 +67,42 @@ class AuthRepositoryTest {
         val result = authRepository.login("test@example.com", "wrong_password")
 
         // Assert
-        assert(result is Result.Error)
+        assertTrue(result is Result.Error)
+    }
+
+    @Test
+    fun `signup with valid data returns success`() = runTest {
+        // Arrange
+        coEvery { authService.signup(any()) } returns mapOf("ok" to true)
+
+        // Act
+        val result = authRepository.signup("test@example.com", "password", "Name", "123456789")
+
+        // Assert
+        assertTrue(result is Result.Success)
+    }
+
+    @Test
+    fun `forgotPassword with valid email returns success`() = runTest {
+        // Arrange
+        coEvery { authService.forgotPassword(any()) } returns mapOf("ok" to true)
+
+        // Act
+        val result = authRepository.forgotPassword("test@example.com")
+
+        // Assert
+        assertTrue(result is Result.Success)
+    }
+
+    @Test
+    fun `resetPassword with valid token and password returns success`() = runTest {
+        // Arrange
+        coEvery { authService.resetPassword(any()) } returns mapOf("ok" to true)
+
+        // Act
+        val result = authRepository.resetPassword("token", "new_password")
+
+        // Assert
+        assertTrue(result is Result.Success)
     }
 }

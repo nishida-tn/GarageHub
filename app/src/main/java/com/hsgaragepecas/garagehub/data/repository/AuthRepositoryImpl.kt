@@ -1,37 +1,32 @@
 package com.hsgaragepecas.garagehub.data.repository
 
 import com.hsgaragepecas.garagehub.data.local.user.UserPreferencesDataSource
+import com.hsgaragepecas.garagehub.data.model.ForgotPasswordRequest
 import com.hsgaragepecas.garagehub.data.model.LoginRequest
 import com.hsgaragepecas.garagehub.data.model.LoginResponse
 import com.hsgaragepecas.garagehub.data.model.MeResponse
+import com.hsgaragepecas.garagehub.data.model.ResetPasswordRequest
+import com.hsgaragepecas.garagehub.data.model.SignupRequest
 import com.hsgaragepecas.garagehub.data.model.UserPreferences
 import com.hsgaragepecas.garagehub.data.remote.AuthService
 import com.hsgaragepecas.garagehub.domain.Result
 import com.hsgaragepecas.garagehub.domain.repository.AuthRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import retrofit2.HttpException
 import javax.inject.Inject
 
 /**
- * Implementation of the [AuthRepository].
+ * Implementation of the [AuthRepository] interface.
+ *
+ * @param authService The authentication Retrofit service.
+ * @param userPreferencesDataSource The user preferences data source.
  */
 class AuthRepositoryImpl @Inject constructor(
     private val authService: AuthService,
     private val userPreferencesDataSource: UserPreferencesDataSource
 ) : AuthRepository {
-    /**
-     * Logs in a user.
-     *
-     * @param email The user's email.
-     * @param password The user's password.
-     * @return A result indicating whether the login was successful.
-     */
-    override suspend fun login(email: String, password: String): Result<LoginResponse> = withContext(
-        Dispatchers.IO){
-        return@withContext try {
-            val loginRequest = LoginRequest(email, password, "oficina")
-            val response = authService.login(loginRequest)
+
+    override suspend fun login(email: String, password: String): Result<LoginResponse> {
+        return try {
+            val response = authService.login(LoginRequest(email, password, "hs"))
             userPreferencesDataSource.saveUserPreferences(
                 UserPreferences(
                     token = response.token,
@@ -42,19 +37,64 @@ class AuthRepositoryImpl @Inject constructor(
                 )
             )
             Result.Success(response)
-        } catch (e: HttpException) {
-            if (e.code() == 401) {
-                Result.Error(Exception("Invalid credentials", e))
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    override suspend fun signup(
+        email: String,
+        password: String,
+        name: String?,
+        whatsapp: String
+    ): Result<Unit> {
+        return try {
+            val request = SignupRequest(
+                email = email,
+                password = password,
+                name = name,
+                whatsapp = whatsapp,
+                portal = "hs"
+            )
+            val response = authService.signup(request)
+            if (response["ok"] == true) {
+                Result.Success(Unit)
             } else {
-                Result.Error(e)
+                Result.Error(Exception("Signup failed"))
             }
         } catch (e: Exception) {
             Result.Error(e)
         }
     }
 
-    override suspend fun getMe(): Result<MeResponse> = withContext(Dispatchers.IO) {
-        return@withContext try {
+    override suspend fun forgotPassword(email: String): Result<Unit> {
+        return try {
+            val response = authService.forgotPassword(ForgotPasswordRequest(email))
+            if (response["ok"] == true) {
+                Result.Success(Unit)
+            } else {
+                Result.Error(Exception("Forgot password request failed"))
+            }
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    override suspend fun resetPassword(token: String, newPassword: String): Result<Unit> {
+        return try {
+            val response = authService.resetPassword(ResetPasswordRequest(token, newPassword))
+            if (response["ok"] == true) {
+                Result.Success(Unit)
+            } else {
+                Result.Error(Exception("Reset password failed"))
+            }
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    override suspend fun getMe(): Result<MeResponse> {
+        return try {
             val response = authService.getMe()
             Result.Success(response)
         } catch (e: Exception) {
