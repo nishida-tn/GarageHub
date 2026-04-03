@@ -26,10 +26,8 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,7 +37,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.hsgaragepecas.garagehub.R
+import com.hsgaragepecas.garagehub.ui.estimate.CreateEstimateContract.CreateEstimateUiIntent
+import com.hsgaragepecas.garagehub.ui.estimate.CreateEstimateContract.CreateEstimateUiState
 import com.hsgaragepecas.garagehub.ui.theme.GarageDivider
 import com.hsgaragepecas.garagehub.ui.theme.GarageGreyText
 import com.hsgaragepecas.garagehub.ui.theme.GarageHubTheme
@@ -48,10 +49,24 @@ import com.hsgaragepecas.garagehub.ui.theme.GarageYellow
 /**
  * A screen that allows the user to create a new estimate.
  *
- * @param modifier The modifier to be applied to the screen.
+ * @param viewModel The ViewModel that manages the screen state.
  */
 @Composable
 fun CreateEstimateScreen(
+    viewModel: CreateEstimateViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    CreateEstimateContent(
+        uiState = uiState,
+        onIntent = viewModel::onIntent
+    )
+}
+
+@Composable
+private fun CreateEstimateContent(
+    uiState: CreateEstimateUiState,
+    onIntent: (CreateEstimateUiIntent) -> Unit
 ) {
     val scrollState = rememberScrollState()
     Surface(
@@ -81,14 +96,14 @@ fun CreateEstimateScreen(
             ) {
                 EstimateInputField(
                     label = stringResource(R.string.mo_hour_value_label),
-                    value = "80,00",
-                    onValueChange = {},
+                    value = uiState.moHourValue,
+                    onValueChange = { onIntent(CreateEstimateUiIntent.OnMoHourValueChange(it)) },
                     modifier = Modifier.weight(1f)
                 )
                 EstimateInputField(
                     label = stringResource(R.string.painting_hour_value_label),
-                    value = "100,00",
-                    onValueChange = {},
+                    value = uiState.paintingHourValue,
+                    onValueChange = { onIntent(CreateEstimateUiIntent.OnPaintingHourValueChange(it)) },
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -114,53 +129,63 @@ fun CreateEstimateScreen(
 
             EstimateInputField(
                 label = stringResource(R.string.customer_name_label),
-                value = "",
-                onValueChange = {})
+                value = uiState.clientName,
+                onValueChange = { onIntent(CreateEstimateUiIntent.OnClientNameChange(it)) }
+            )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateInputField(
                 label = stringResource(R.string.customer_tel_label),
-                value = "",
-                onValueChange = {})
+                value = uiState.clientTel,
+                onValueChange = { onIntent(CreateEstimateUiIntent.OnClientTelChange(it)) }
+            )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateInputField(
                 label = stringResource(R.string.customer_whatsapp_label),
-                value = "",
-                onValueChange = {})
+                value = uiState.clientWhats,
+                onValueChange = { onIntent(CreateEstimateUiIntent.OnClientWhatsChange(it)) }
+            )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateInputField(
                 label = stringResource(R.string.customer_cep_label),
-                value = "",
-                onValueChange = {})
+                value = uiState.clientCep,
+                onValueChange = { onIntent(CreateEstimateUiIntent.OnClientCepChange(it)) }
+            )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateInputField(
                 label = stringResource(R.string.customer_address_label),
-                value = "",
-                onValueChange = {})
+                value = uiState.clientAddress,
+                onValueChange = { onIntent(CreateEstimateUiIntent.OnClientAddressChange(it)) }
+            )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateInputField(
                 label = stringResource(R.string.customer_number_label),
-                value = "",
-                onValueChange = {})
+                value = uiState.clientNumber,
+                onValueChange = { onIntent(CreateEstimateUiIntent.OnClientNumberChange(it)) }
+            )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateInputField(
                 label = stringResource(R.string.customer_neighborhood_label),
-                value = "",
-                onValueChange = {})
+                value = uiState.clientNeighborhood,
+                onValueChange = { onIntent(CreateEstimateUiIntent.OnClientNeighborhoodChange(it)) }
+            )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateInputField(
                 label = stringResource(R.string.customer_city_label),
-                value = "",
-                onValueChange = {})
+                value = uiState.clientCity,
+                onValueChange = { onIntent(CreateEstimateUiIntent.OnClientCityChange(it)) }
+            )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateInputField(
                 label = stringResource(R.string.customer_uf_label),
-                value = "",
-                onValueChange = {})
+                value = uiState.clientUf,
+                onValueChange = { onIntent(CreateEstimateUiIntent.OnClientUfChange(it)) }
+            )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateInputField(
                 label = stringResource(R.string.customer_complement_label),
-                value = "",
-                onValueChange = {})
+                value = uiState.clientComplement,
+                onValueChange = { onIntent(CreateEstimateUiIntent.OnClientComplementChange(it)) }
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -169,52 +194,54 @@ fun CreateEstimateScreen(
 
             EstimateInputField(
                 label = stringResource(R.string.vehicle_plate_label),
-                value = "",
-                onValueChange = {})
+                value = uiState.vehiclePlate,
+                onValueChange = { onIntent(CreateEstimateUiIntent.OnVehiclePlateChange(it)) }
+            )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateDropdownField(
                 label = stringResource(R.string.vehicle_brand_label),
-                selectedOption = stringResource(R.string.select_option)
+                selectedOption = if (uiState.vehicleBrand.isEmpty()) stringResource(R.string.select_option) else uiState.vehicleBrand
             )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateDropdownField(
                 label = stringResource(R.string.vehicle_model_label),
-                selectedOption = stringResource(R.string.select_brand_option)
+                selectedOption = if (uiState.vehicleModel.isEmpty()) stringResource(R.string.select_brand_option) else uiState.vehicleModel
             )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateDropdownField(
                 label = stringResource(R.string.vehicle_manufacturing_year_label),
-                selectedOption = stringResource(R.string.select_model_option)
+                selectedOption = if (uiState.vehicleYearFab.isEmpty()) stringResource(R.string.select_model_option) else uiState.vehicleYearFab
             )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateDropdownField(
                 label = stringResource(R.string.vehicle_model_year_label),
-                selectedOption = stringResource(R.string.select_model_option)
+                selectedOption = if (uiState.vehicleYearMod.isEmpty()) stringResource(R.string.select_model_option) else uiState.vehicleYearMod
             )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateInputField(
                 label = stringResource(R.string.vehicle_chassis_label),
-                value = "",
-                onValueChange = {})
+                value = uiState.vehicleChassis,
+                onValueChange = { onIntent(CreateEstimateUiIntent.OnVehicleChassisChange(it)) }
+            )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateDropdownField(
                 label = stringResource(R.string.vehicle_fuel_label),
-                selectedOption = stringResource(R.string.select_option)
+                selectedOption = if (uiState.vehicleFuel.isEmpty()) stringResource(R.string.select_option) else uiState.vehicleFuel
             )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateDropdownField(
                 label = stringResource(R.string.vehicle_air_conditioning_label),
-                selectedOption = stringResource(R.string.select_option)
+                selectedOption = if (uiState.vehicleAir.isEmpty()) stringResource(R.string.select_option) else uiState.vehicleAir
             )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateDropdownField(
                 label = stringResource(R.string.vehicle_steering_label),
-                selectedOption = stringResource(R.string.select_option)
+                selectedOption = if (uiState.vehicleSteering.isEmpty()) stringResource(R.string.select_option) else uiState.vehicleSteering
             )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateDropdownField(
                 label = stringResource(R.string.vehicle_transmission_label),
-                selectedOption = stringResource(R.string.select_option)
+                selectedOption = if (uiState.vehicleTransmission.isEmpty()) stringResource(R.string.select_option) else uiState.vehicleTransmission
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -282,31 +309,49 @@ fun CreateEstimateScreen(
 
             EstimateInputField(
                 label = stringResource(R.string.item_genuine_code_label),
-                value = "",
-                onValueChange = {})
+                value = uiState.itemGenuineCode,
+                onValueChange = { onIntent(CreateEstimateUiIntent.OnItemGenuineCodeChange(it)) }
+            )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateInputField(
                 label = stringResource(R.string.item_part_label),
-                value = "",
-                onValueChange = {},
+                value = uiState.itemPartName,
+                onValueChange = { onIntent(CreateEstimateUiIntent.OnItemPartNameChange(it)) },
                 placeholder = stringResource(R.string.item_part_placeholder)
             )
             Spacer(modifier = Modifier.height(12.dp))
 
-            ItemCheckBoxWithInput(label = stringResource(R.string.item_t_h_label))
-            ItemCheckBoxWithInput(label = stringResource(R.string.item_ri_h_label))
-            ItemCheckBoxWithInput(label = stringResource(R.string.item_r_h_label))
-            ItemCheckBoxWithInput(label = stringResource(R.string.item_p_h_label))
+            ItemCheckBoxWithInput(
+                label = stringResource(R.string.item_t_h_label),
+                checked = uiState.itemTH,
+                onCheckedChange = { onIntent(CreateEstimateUiIntent.OnItemTHChange(it)) }
+            )
+            ItemCheckBoxWithInput(
+                label = stringResource(R.string.item_ri_h_label),
+                checked = uiState.itemRiH,
+                onCheckedChange = { onIntent(CreateEstimateUiIntent.OnItemRiHChange(it)) }
+            )
+            ItemCheckBoxWithInput(
+                label = stringResource(R.string.item_r_h_label),
+                checked = uiState.itemRH,
+                onCheckedChange = { onIntent(CreateEstimateUiIntent.OnItemRHChange(it)) }
+            )
+            ItemCheckBoxWithInput(
+                label = stringResource(R.string.item_p_h_label),
+                checked = uiState.itemPH,
+                onCheckedChange = { onIntent(CreateEstimateUiIntent.OnItemPHChange(it)) }
+            )
 
             Spacer(modifier = Modifier.height(12.dp))
             EstimateInputField(
                 label = stringResource(R.string.item_part_price_label),
-                value = "0,00",
-                onValueChange = {})
+                value = uiState.itemPartPrice,
+                onValueChange = { onIntent(CreateEstimateUiIntent.OnItemPartPriceChange(it)) }
+            )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateInputField(
                 label = stringResource(R.string.item_total_label),
-                value = "",
+                value = "", // This should be calculated
                 onValueChange = {})
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -327,7 +372,7 @@ fun CreateEstimateScreen(
 
             // Final Buttons
             Button(
-                onClick = { },
+                onClick = { onIntent(CreateEstimateUiIntent.SaveEstimate) },
                 colors = ButtonDefaults.buttonColors(containerColor = GarageYellow),
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier
@@ -471,15 +516,20 @@ private fun EstimateDropdownField(
  * A composable that displays a checkbox with an input field for the estimate screen.
  *
  * @param label The label to be displayed next to the checkbox.
+ * @param checked Whether the checkbox is checked.
+ * @param onCheckedChange A lambda to be called when the checked state changes.
  */
 @Composable
-private fun ItemCheckBoxWithInput(label: String) {
-    var checked by remember { mutableStateOf(false) }
+private fun ItemCheckBoxWithInput(
+    label: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Checkbox(
                 checked = checked,
-                onCheckedChange = { checked = it },
+                onCheckedChange = onCheckedChange,
                 colors = CheckboxDefaults.colors(
                     checkedColor = MaterialTheme.colorScheme.onBackground,
                     uncheckedColor = MaterialTheme.colorScheme.onBackground,
@@ -493,7 +543,7 @@ private fun ItemCheckBoxWithInput(label: String) {
             )
         }
         OutlinedTextField(
-            value = "",
+            value = "", // This would also need to be in the state if you want to track hours per action
             onValueChange = {},
             modifier = Modifier
                 .fillMaxWidth()
@@ -541,7 +591,10 @@ private fun ActionButton(
 @Composable
 private fun CreateEstimateScreenPreview() {
     GarageHubTheme(darkTheme = false) {
-        CreateEstimateScreen()
+        CreateEstimateContent(
+            uiState = CreateEstimateUiState(),
+            onIntent = {}
+        )
     }
 }
 
@@ -549,6 +602,9 @@ private fun CreateEstimateScreenPreview() {
 @Composable
 private fun CreateEstimateScreenDarkPreview() {
     GarageHubTheme(darkTheme = true) {
-        CreateEstimateScreen()
+        CreateEstimateContent(
+            uiState = CreateEstimateUiState(),
+            onIntent = {}
+        )
     }
 }
