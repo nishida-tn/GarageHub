@@ -1,5 +1,7 @@
 package com.hsgaragepecas.garagehub.ui.account.login
 
+import com.hsgaragepecas.garagehub.domain.usecases.LoginUseCase
+import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -15,12 +17,14 @@ class LoginViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
 
+    private lateinit var loginUseCase: LoginUseCase
     private lateinit var viewModel: LoginViewModelImpl
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = LoginViewModelImpl()
+        loginUseCase = mockk()
+        viewModel = LoginViewModelImpl(loginUseCase)
     }
 
     @After

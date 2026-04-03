@@ -64,6 +64,10 @@ data class EstimateItemDto(
     @SerialName("sel_ri") val selRi: Int? = 0,
     @SerialName("sel_r") val selR: Int? = 0,
     @SerialName("sel_p") val selP: Int? = 0,
+    @SerialName("sug_t") val sugT: Double? = 0.0,
+    @SerialName("sug_ri") val sugRi: Double? = 0.0,
+    @SerialName("sug_r") val sugR: Double? = 0.0,
+    @SerialName("sug_p") val sugP: Double? = 0.0,
     @SerialName("valor_t") val valueT: Double? = null,
     @SerialName("valor_ri") val valueRi: Double? = null,
     @SerialName("valor_r") val valueR: Double? = null,
@@ -82,4 +86,72 @@ data class ProposalDto(
     @SerialName("loja_whats") val shopWhats: String? = null,
     @SerialName("proposta_id") val proposalId: Int? = null,
     @SerialName("is_proposal") val isProposal: Boolean = true
+)
+
+@Serializable
+data class TimeSuggestionResponse(
+    @SerialName("ok") val ok: Boolean,
+    @SerialName("t") val t: Double = 0.0,
+    @SerialName("ri") val ri: Double = 0.0,
+    @SerialName("r") val r: Double = 0.0,
+    @SerialName("p") val p: Double = 0.0
+)
+
+@Serializable
+data class EstimateUpdateRequest(
+    @SerialName("titulo") val title: String,
+    @SerialName("descricao") val description: String? = null,
+    @SerialName("mo_valor_hora") val moHourValue: Double? = null,
+    @SerialName("pintura_valor_hora") val paintingHourValue: Double? = null,
+    @SerialName("cliente_nome") val clientName: String? = null,
+    @SerialName("cliente_tel") val clientTel: String? = null,
+    @SerialName("cliente_whats") val clientWhats: String? = null,
+    @SerialName("cliente_cep") val clientCep: String? = null,
+    @SerialName("cliente_endereco") val clientAddress: String? = null,
+    @SerialName("cliente_numero") val clientNumber: String? = null,
+    @SerialName("cliente_bairro") val clientNeighborhood: String? = null,
+    @SerialName("cliente_cidade") val clientCity: String? = null,
+    @SerialName("cliente_uf") val clientUf: String? = null,
+    @SerialName("cliente_complemento") val clientComplement: String? = null,
+    @SerialName("veiculo_placa") val vehiclePlate: String? = null,
+    @SerialName("veiculo_marca") val vehicleBrand: String? = null,
+    @SerialName("veiculo_modelo") val vehicleModel: String? = null,
+    @SerialName("veiculo_ano") val vehicleYear: String? = null,
+    @SerialName("veiculo_fipe") val vehicleFipe: String? = null,
+    @SerialName("veiculo_ano_fab") val vehicleYearFab: Int? = null,
+    @SerialName("veiculo_ano_mod") val vehicleYearMod: Int? = null,
+    @SerialName("veiculo_chassi") val vehicleChassis: String? = null,
+    @SerialName("veiculo_combustivel") val vehicleFuel: String? = null,
+    @SerialName("veiculo_ar") val vehicleAir: String? = null,
+    @SerialName("veiculo_direcao") val vehicleSteering: String? = null,
+    @SerialName("veiculo_cambio") val vehicleTransmission: String? = null,
+    @SerialName("items") val items: List<EstimateItemDto> = emptyList()
+)
+
+@Serializable
+data class CreateDemandRequest(
+    @SerialName("cliente_nome") val clientName: String,
+    @SerialName("cliente_tel") val clientTel: String,
+    @SerialName("veic_marca") val vehicleBrand: String,
+    @SerialName("veic_modelo") val vehicleModel: String,
+    @SerialName("ano_fab") val yearFab: Int,
+    @SerialName("ano_mod") val yearMod: Int,
+    @SerialName("chassi") val chassis: String? = null,
+    @SerialName("tipo_combustivel") val fuelType: String? = null,
+    @SerialName("ar_condicionado") val airConditioning: String? = null,
+    @SerialName("tipo_direcao") val steeringType: String? = null,
+    @SerialName("tipo_cambio") val transmissionType: String? = null,
+    @SerialName("foto_urls") val photoUrls: List<String> = emptyList(),
+    @SerialName("itens") val items: List<DemandItemDto>,
+    @SerialName("ofi_orca") val estimateId: Int? = null
+)
+
+@Serializable
+data class DemandItemDto(
+    @SerialName("descricao") val description: String,
+    @SerialName("qtd") val quantity: Int = 1,
+    @SerialName("codigo_concessionaria") val dealershipCode: String? = null,
+    @SerialName("obs") val observation: String? = null,
+    @SerialName("ofi_item_id") val estimateItemId: Int? = null,
+    @SerialName("ofi_item_idx") val estimateItemIdx: Int? = null
 )

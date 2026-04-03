@@ -1,8 +1,11 @@
 package com.hsgaragepecas.garagehub.ui.settings
 
 import com.hsgaragepecas.garagehub.domain.usecases.CheckPasswordUseCase
+import com.hsgaragepecas.garagehub.domain.usecases.LogoutUseCase
 import com.hsgaragepecas.garagehub.domain.usecases.SaveHourlyRatesUseCase
 import com.hsgaragepecas.garagehub.domain.usecases.SaveSettingsUseCase
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -24,6 +27,7 @@ class SettingsViewModelTest {
     private lateinit var saveSettingsUseCase: SaveSettingsUseCase
     private lateinit var checkPasswordUseCase: CheckPasswordUseCase
     private lateinit var saveHourlyRatesUseCase: SaveHourlyRatesUseCase
+    private lateinit var logoutUseCase: LogoutUseCase
     private lateinit var viewModel: SettingsViewModelImpl
 
     @Before
@@ -32,7 +36,13 @@ class SettingsViewModelTest {
         saveSettingsUseCase = mockk()
         checkPasswordUseCase = mockk()
         saveHourlyRatesUseCase = mockk()
-        viewModel = SettingsViewModelImpl(saveSettingsUseCase, checkPasswordUseCase, saveHourlyRatesUseCase)
+        logoutUseCase = mockk(relaxUnitFun = true)
+        viewModel = SettingsViewModelImpl(
+            saveSettingsUseCase,
+            checkPasswordUseCase,
+            saveHourlyRatesUseCase,
+            logoutUseCase
+        )
     }
 
     @After
@@ -185,5 +195,15 @@ class SettingsViewModelTest {
         // Assert
         assertEquals(false, viewModel.uiState.value.isRatesSaved)
         assertEquals("Invalid mechanics rate", viewModel.uiState.value.ratesError)
+    }
+
+    @Test
+    fun `logout should call logoutUseCase`() = runTest {
+        // Act
+        viewModel.logout()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Assert
+        coVerify { logoutUseCase() }
     }
 }

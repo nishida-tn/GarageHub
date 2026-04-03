@@ -32,7 +32,6 @@ class AuthRepositoryTest {
     fun `login with valid credentials returns success and saves user preferences`() = runTest {
         // Arrange
         val loginResponse = LoginResponse(
-            ok = true,
             token = "test_token",
             uid = 1,
             name = "Test User",

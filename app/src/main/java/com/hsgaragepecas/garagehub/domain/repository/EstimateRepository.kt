@@ -1,7 +1,10 @@
 package com.hsgaragepecas.garagehub.domain.repository
 
+import com.hsgaragepecas.garagehub.data.model.CreateDemandRequest
 import com.hsgaragepecas.garagehub.data.model.EstimateDetailResponse
 import com.hsgaragepecas.garagehub.data.model.EstimateListResponse
+import com.hsgaragepecas.garagehub.data.model.EstimateUpdateRequest
+import com.hsgaragepecas.garagehub.data.model.TimeSuggestionResponse
 
 /**
  * The repository for estimates.
@@ -31,4 +34,54 @@ interface EstimateRepository {
      * @return The estimate detail response.
      */
     suspend fun getEstimateDetail(estimateId: Int): EstimateDetailResponse
+
+    /**
+     * Updates an estimate.
+     *
+     * @param estimateId The ID of the estimate.
+     * @param request The update request.
+     * @return The estimate detail response.
+     */
+    suspend fun updateEstimate(estimateId: Int, request: EstimateUpdateRequest): EstimateDetailResponse
+
+    /**
+     * Deletes an estimate.
+     *
+     * @param estimateId The ID of the estimate.
+     * @return Whether the deletion was successful.
+     */
+    suspend fun deleteEstimate(estimateId: Int): Boolean
+
+    /**
+     * Gets time suggestions for a part.
+     *
+     * @param partName The name of the part.
+     * @return The time suggestion response.
+     */
+    suspend fun getTimeSuggestion(partName: String): TimeSuggestionResponse
+
+    /**
+     * Generates orders from an estimate.
+     *
+     * @param estimateId The ID of the estimate.
+     * @return A map with the result.
+     */
+    suspend fun generateOrders(estimateId: Int): Map<String, Any>
+
+    /**
+     * Checks if an item can be deleted from an estimate.
+     *
+     * @param estimateId The ID of the estimate.
+     * @param itemId The ID of the item.
+     * @return A map with the result.
+     */
+    suspend fun checkItemDeletion(estimateId: Int, itemId: Int): Map<String, Any>
+
+    /**
+     * Creates a demand for an estimate.
+     *
+     * @param request The demand request.
+     * @return A map with the result.
+     */
+    suspend fun createDemand(request: CreateDemandRequest): Map<String, Any>
 }
