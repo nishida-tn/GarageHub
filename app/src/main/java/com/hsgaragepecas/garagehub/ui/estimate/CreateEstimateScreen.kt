@@ -1,6 +1,7 @@
 package com.hsgaragepecas.garagehub.ui.estimate
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -28,6 +31,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -198,24 +204,42 @@ private fun CreateEstimateContent(
                 onValueChange = { onIntent(CreateEstimateUiIntent.OnVehiclePlateChange(it)) }
             )
             Spacer(modifier = Modifier.height(12.dp))
+            
+            // Placeholder for brand/model/years - in a real app these would come from an API
+            val dummyBrands = listOf("Volkswagen", "Fiat", "Chevrolet", "Ford", "Toyota", "Honda", "Hyundai")
+            val dummyModels = listOf("Gol", "Uno", "Onix", "Ka", "Corolla", "Civic", "HB20")
+            val dummyYears = (2000..2025).map { it.toString() }.reversed()
+            val fuelOptions = listOf("Gasolina", "Álcool", "Flex", "Diesel", "GNV", "Elétrico", "Híbrido")
+            val airOptions = listOf("Sim", "Não")
+            val steeringOptions = listOf("Hidráulica", "Elétrica", "Mecânica", "Eletro-hidráulica")
+            val transmissionOptions = listOf("Manual", "Automático", "CVT", "Automatizado")
+
             EstimateDropdownField(
                 label = stringResource(R.string.vehicle_brand_label),
-                selectedOption = if (uiState.vehicleBrand.isEmpty()) stringResource(R.string.select_option) else uiState.vehicleBrand
+                selectedOption = if (uiState.vehicleBrand.isEmpty()) stringResource(R.string.select_option) else uiState.vehicleBrand,
+                options = dummyBrands,
+                onOptionSelected = { onIntent(CreateEstimateUiIntent.OnVehicleBrandChange(it)) }
             )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateDropdownField(
                 label = stringResource(R.string.vehicle_model_label),
-                selectedOption = if (uiState.vehicleModel.isEmpty()) stringResource(R.string.select_brand_option) else uiState.vehicleModel
+                selectedOption = if (uiState.vehicleModel.isEmpty()) stringResource(R.string.select_brand_option) else uiState.vehicleModel,
+                options = dummyModels,
+                onOptionSelected = { onIntent(CreateEstimateUiIntent.OnVehicleModelChange(it)) }
             )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateDropdownField(
                 label = stringResource(R.string.vehicle_manufacturing_year_label),
-                selectedOption = if (uiState.vehicleYearFab.isEmpty()) stringResource(R.string.select_model_option) else uiState.vehicleYearFab
+                selectedOption = if (uiState.vehicleYearFab.isEmpty()) stringResource(R.string.select_model_option) else uiState.vehicleYearFab,
+                options = dummyYears,
+                onOptionSelected = { onIntent(CreateEstimateUiIntent.OnVehicleYearFabChange(it)) }
             )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateDropdownField(
                 label = stringResource(R.string.vehicle_model_year_label),
-                selectedOption = if (uiState.vehicleYearMod.isEmpty()) stringResource(R.string.select_model_option) else uiState.vehicleYearMod
+                selectedOption = if (uiState.vehicleYearMod.isEmpty()) stringResource(R.string.select_model_option) else uiState.vehicleYearMod,
+                options = dummyYears,
+                onOptionSelected = { onIntent(CreateEstimateUiIntent.OnVehicleYearModChange(it)) }
             )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateInputField(
@@ -226,22 +250,30 @@ private fun CreateEstimateContent(
             Spacer(modifier = Modifier.height(12.dp))
             EstimateDropdownField(
                 label = stringResource(R.string.vehicle_fuel_label),
-                selectedOption = if (uiState.vehicleFuel.isEmpty()) stringResource(R.string.select_option) else uiState.vehicleFuel
+                selectedOption = if (uiState.vehicleFuel.isEmpty()) stringResource(R.string.select_option) else uiState.vehicleFuel,
+                options = fuelOptions,
+                onOptionSelected = { onIntent(CreateEstimateUiIntent.OnVehicleFuelChange(it)) }
             )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateDropdownField(
                 label = stringResource(R.string.vehicle_air_conditioning_label),
-                selectedOption = if (uiState.vehicleAir.isEmpty()) stringResource(R.string.select_option) else uiState.vehicleAir
+                selectedOption = if (uiState.vehicleAir.isEmpty()) stringResource(R.string.select_option) else uiState.vehicleAir,
+                options = airOptions,
+                onOptionSelected = { onIntent(CreateEstimateUiIntent.OnVehicleAirChange(it)) }
             )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateDropdownField(
                 label = stringResource(R.string.vehicle_steering_label),
-                selectedOption = if (uiState.vehicleSteering.isEmpty()) stringResource(R.string.select_option) else uiState.vehicleSteering
+                selectedOption = if (uiState.vehicleSteering.isEmpty()) stringResource(R.string.select_option) else uiState.vehicleSteering,
+                options = steeringOptions,
+                onOptionSelected = { onIntent(CreateEstimateUiIntent.OnVehicleSteeringChange(it)) }
             )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateDropdownField(
                 label = stringResource(R.string.vehicle_transmission_label),
-                selectedOption = if (uiState.vehicleTransmission.isEmpty()) stringResource(R.string.select_option) else uiState.vehicleTransmission
+                selectedOption = if (uiState.vehicleTransmission.isEmpty()) stringResource(R.string.select_option) else uiState.vehicleTransmission,
+                options = transmissionOptions,
+                onOptionSelected = { onIntent(CreateEstimateUiIntent.OnVehicleTransmissionChange(it)) }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -478,14 +510,20 @@ private fun EstimateInputField(
  *
  * @param label The label to be displayed above the dropdown field.
  * @param selectedOption The currently selected option in the dropdown field.
+ * @param options The list of options to be displayed in the dropdown menu.
+ * @param onOptionSelected A lambda to be called when an option is selected.
  * @param modifier The modifier to be applied to the dropdown field.
  */
 @Composable
 private fun EstimateDropdownField(
     label: String,
     selectedOption: String,
+    options: List<String>,
+    onOptionSelected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var expanded by remember { mutableStateOf(false) }
+
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = label,
@@ -494,19 +532,39 @@ private fun EstimateDropdownField(
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            color = MaterialTheme.colorScheme.surface,
-            shape = RoundedCornerShape(8.dp),
-            border = BorderStroke(1.dp, GarageDivider)
-        ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+        Box {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expanded = true },
+                color = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(8.dp),
+                border = BorderStroke(1.dp, GarageDivider)
             ) {
-                Text(text = selectedOption, color = MaterialTheme.colorScheme.onSurface)
-                Text(text = "▼", color = MaterialTheme.colorScheme.onSurface, fontSize = 10.sp)
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = selectedOption, color = MaterialTheme.colorScheme.onSurface)
+                    Text(text = "▼", color = MaterialTheme.colorScheme.onSurface, fontSize = 10.sp)
+                }
+            }
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.fillMaxWidth(0.9f)
+            ) {
+                options.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(text = option) },
+                        onClick = {
+                            onOptionSelected(option)
+                            expanded = false
+                        }
+                    )
+                }
             }
         }
     }
