@@ -73,6 +73,7 @@ class CreateEstimateViewModel @Inject constructor(
             is CreateEstimateUiIntent.OnVehicleAirChange -> _uiState.update { it.copy(vehicleAir = intent.value) }
             is CreateEstimateUiIntent.OnVehicleSteeringChange -> _uiState.update { it.copy(vehicleSteering = intent.value) }
             is CreateEstimateUiIntent.OnVehicleTransmissionChange -> _uiState.update { it.copy(vehicleTransmission = intent.value) }
+            is CreateEstimateUiIntent.OnAddVehiclePhotos -> _uiState.update { it.copy(vehiclePhotos = it.vehiclePhotos + intent.uris) }
             is CreateEstimateUiIntent.OnItemGenuineCodeChange -> _uiState.update { it.copy(itemGenuineCode = intent.value) }
             is CreateEstimateUiIntent.OnItemPartNameChange -> _uiState.update { it.copy(itemPartName = intent.value) }
             is CreateEstimateUiIntent.OnItemTHChange -> _uiState.update { it.copy(itemTH = intent.value) }
