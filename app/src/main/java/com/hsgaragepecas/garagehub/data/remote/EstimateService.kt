@@ -47,6 +47,17 @@ interface EstimateService {
     ): EstimateDetailResponse
 
     /**
+     * Creates a new estimate.
+     *
+     * @param request The create request.
+     * @return The estimate detail response.
+     */
+    @POST("oficina/orcamentos")
+    suspend fun createEstimate(
+        @Body request: EstimateUpdateRequest
+    ): Map<String, Any>
+
+    /**
      * Updates an estimate.
      *
      * @param estimateId The ID of the estimate.

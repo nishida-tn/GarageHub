@@ -31,6 +31,10 @@ class EstimateRepositoryImpl @Inject constructor(
         return estimateService.getEstimateDetail(estimateId)
     }
 
+    override suspend fun createEstimate(request: EstimateUpdateRequest): Map<String, Any> {
+        return estimateService.createEstimate(request)
+    }
+
     override suspend fun updateEstimate(
         estimateId: Int,
         request: EstimateUpdateRequest

@@ -4,12 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hsgaragepecas.garagehub.data.model.EstimateFullDto
 import com.hsgaragepecas.garagehub.data.model.EstimateItemDto
+import com.hsgaragepecas.garagehub.data.model.EstimateUpdateRequest
 import com.hsgaragepecas.garagehub.data.model.FipeBrandDto
 import com.hsgaragepecas.garagehub.data.model.FipeModelDto
 import com.hsgaragepecas.garagehub.data.model.FipeYearDto
 import com.hsgaragepecas.garagehub.data.remote.ViaCepService
 import com.hsgaragepecas.garagehub.domain.repository.EstimateRepository
 import com.hsgaragepecas.garagehub.domain.repository.FipeRepository
+import com.hsgaragepecas.garagehub.domain.usecases.CreateEstimateUseCase
 import com.hsgaragepecas.garagehub.domain.usecases.GenerateEstimatePdfUseCase
 import com.hsgaragepecas.garagehub.ui.estimate.CreateEstimateContract.CreateEstimateUiEvent
 import com.hsgaragepecas.garagehub.ui.estimate.CreateEstimateContract.CreateEstimateUiIntent
@@ -36,7 +38,8 @@ class CreateEstimateViewModel @Inject constructor(
     private val estimateRepository: EstimateRepository,
     private val fipeRepository: FipeRepository,
     private val viaCepService: ViaCepService,
-    private val generateEstimatePdfUseCase: GenerateEstimatePdfUseCase
+    private val generateEstimatePdfUseCase: GenerateEstimatePdfUseCase,
+    private val createEstimateUseCase: CreateEstimateUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreateEstimateUiState())
@@ -280,12 +283,58 @@ class CreateEstimateViewModel @Inject constructor(
     }
 
     private fun saveEstimate() {
+        val state = _uiState.value
+        if (state.clientName.isBlank()) {
+            viewModelScope.launch {
+                _uiEvent.send(CreateEstimateUiEvent.ShowToast("O nome do cliente é obrigatório"))
+            }
+            return
+        }
+
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true) }
-            // Implementation for saving estimate will go here
-            _uiState.update { it.copy(isSaving = false) }
-            _uiEvent.send(CreateEstimateUiEvent.ShowToast("Estimate created successfully"))
-            _uiEvent.send(CreateEstimateUiEvent.NavigateBack)
+            try {
+                val request = EstimateUpdateRequest(
+                    title = state.vehiclePlate.ifBlank { state.clientName },
+                    description = "",
+                    moHourValue = state.moHourValue.replace(",", ".").toDoubleOrNull(),
+                    paintingHourValue = state.paintingHourValue.replace(",", ".").toDoubleOrNull(),
+                    clientName = state.clientName,
+                    clientTel = state.clientTel,
+                    clientWhats = state.clientWhats,
+                    clientCep = state.clientCep,
+                    clientAddress = state.clientAddress,
+                    clientNumber = state.clientNumber,
+                    clientNeighborhood = state.clientNeighborhood,
+                    clientCity = state.clientCity,
+                    clientUf = state.clientUf,
+                    clientComplement = state.clientComplement,
+                    vehiclePlate = state.vehiclePlate,
+                    vehicleBrand = state.vehicleBrand,
+                    vehicleModel = state.vehicleModel,
+                    vehicleYear = "",
+                    vehicleFipe = state.selectedYear?.code ?: "",
+                    vehicleYearFab = state.vehicleYearFab.toIntOrNull(),
+                    vehicleYearMod = state.vehicleYearMod.toIntOrNull(),
+                    vehicleChassis = state.vehicleChassis,
+                    vehicleFuel = state.vehicleFuel,
+                    vehicleAir = state.vehicleAir,
+                    vehicleSteering = state.vehicleSteering,
+                    vehicleTransmission = state.vehicleTransmission,
+                    items = state.items
+                )
+                val response = createEstimateUseCase(request)
+                if (response["ok"] == true) {
+                    _uiEvent.send(CreateEstimateUiEvent.ShowToast("Orçamento criado com sucesso"))
+                    _uiEvent.send(CreateEstimateUiEvent.NavigateBack)
+                } else {
+                    _uiEvent.send(CreateEstimateUiEvent.ShowToast("Erro ao criar orçamento"))
+                }
+            } catch (e: Exception) {
+                _uiEvent.send(CreateEstimateUiEvent.ShowToast("Erro: ${e.message}"))
+            } finally {
+                _uiState.update { it.copy(isSaving = false) }
+            }
         }
     }
 

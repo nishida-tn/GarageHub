@@ -36,6 +36,14 @@ interface EstimateRepository {
     suspend fun getEstimateDetail(estimateId: Int): EstimateDetailResponse
 
     /**
+     * Creates a new estimate.
+     *
+     * @param request The create request.
+     * @return A map with the result.
+     */
+    suspend fun createEstimate(request: EstimateUpdateRequest): Map<String, Any>
+
+    /**
      * Updates an estimate.
      *
      * @param estimateId The ID of the estimate.
