@@ -61,6 +61,7 @@ interface CreateEstimateContract {
         val itemPH: Boolean = false,
         val itemPHValue: String = "",
         val itemPartPrice: String = "0,00",
+        val itemTotal: String = "0,00",
         val error: String? = null,
         val isSaving: Boolean = false
     )

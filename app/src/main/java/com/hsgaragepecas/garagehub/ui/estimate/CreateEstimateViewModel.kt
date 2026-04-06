@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 import javax.inject.Inject
 
 /**
@@ -62,8 +63,14 @@ class CreateEstimateViewModel @Inject constructor(
      */
     fun onIntent(intent: CreateEstimateUiIntent) {
         when (intent) {
-            is CreateEstimateUiIntent.OnMoHourValueChange -> _uiState.update { it.copy(moHourValue = intent.value) }
-            is CreateEstimateUiIntent.OnPaintingHourValueChange -> _uiState.update { it.copy(paintingHourValue = intent.value) }
+            is CreateEstimateUiIntent.OnMoHourValueChange -> {
+                _uiState.update { it.copy(moHourValue = intent.value) }
+                updateCurrentItemTotal()
+            }
+            is CreateEstimateUiIntent.OnPaintingHourValueChange -> {
+                _uiState.update { it.copy(paintingHourValue = intent.value) }
+                updateCurrentItemTotal()
+            }
             is CreateEstimateUiIntent.OnClientNameChange -> _uiState.update { it.copy(clientName = intent.value) }
             is CreateEstimateUiIntent.OnClientTelChange -> _uiState.update { it.copy(clientTel = intent.value) }
             is CreateEstimateUiIntent.OnClientWhatsChange -> _uiState.update { it.copy(clientWhats = intent.value) }
@@ -98,15 +105,42 @@ class CreateEstimateViewModel @Inject constructor(
             is CreateEstimateUiIntent.OnAddVehiclePhotos -> _uiState.update { it.copy(vehiclePhotos = it.vehiclePhotos + intent.uris) }
             is CreateEstimateUiIntent.OnItemGenuineCodeChange -> _uiState.update { it.copy(itemGenuineCode = intent.value) }
             is CreateEstimateUiIntent.OnItemPartNameChange -> onPartNameChange(intent.value)
-            is CreateEstimateUiIntent.OnItemTHChange -> _uiState.update { it.copy(itemTH = intent.value) }
-            is CreateEstimateUiIntent.OnItemTHValueChange -> _uiState.update { it.copy(itemTHValue = intent.value) }
-            is CreateEstimateUiIntent.OnItemRiHChange -> _uiState.update { it.copy(itemRiH = intent.value) }
-            is CreateEstimateUiIntent.OnItemRiHValueChange -> _uiState.update { it.copy(itemRiHValue = intent.value) }
-            is CreateEstimateUiIntent.OnItemRHChange -> _uiState.update { it.copy(itemRH = intent.value) }
-            is CreateEstimateUiIntent.OnItemRHValueChange -> _uiState.update { it.copy(itemRHValue = intent.value) }
-            is CreateEstimateUiIntent.OnItemPHChange -> _uiState.update { it.copy(itemPH = intent.value) }
-            is CreateEstimateUiIntent.OnItemPHValueChange -> _uiState.update { it.copy(itemPHValue = intent.value) }
-            is CreateEstimateUiIntent.OnItemPartPriceChange -> _uiState.update { it.copy(itemPartPrice = intent.value) }
+            is CreateEstimateUiIntent.OnItemTHChange -> {
+                _uiState.update { it.copy(itemTH = intent.value) }
+                updateCurrentItemTotal()
+            }
+            is CreateEstimateUiIntent.OnItemTHValueChange -> {
+                _uiState.update { it.copy(itemTHValue = intent.value) }
+                updateCurrentItemTotal()
+            }
+            is CreateEstimateUiIntent.OnItemRiHChange -> {
+                _uiState.update { it.copy(itemRiH = intent.value) }
+                updateCurrentItemTotal()
+            }
+            is CreateEstimateUiIntent.OnItemRiHValueChange -> {
+                _uiState.update { it.copy(itemRiHValue = intent.value) }
+                updateCurrentItemTotal()
+            }
+            is CreateEstimateUiIntent.OnItemRHChange -> {
+                _uiState.update { it.copy(itemRH = intent.value) }
+                updateCurrentItemTotal()
+            }
+            is CreateEstimateUiIntent.OnItemRHValueChange -> {
+                _uiState.update { it.copy(itemRHValue = intent.value) }
+                updateCurrentItemTotal()
+            }
+            is CreateEstimateUiIntent.OnItemPHChange -> {
+                _uiState.update { it.copy(itemPH = intent.value) }
+                updateCurrentItemTotal()
+            }
+            is CreateEstimateUiIntent.OnItemPHValueChange -> {
+                _uiState.update { it.copy(itemPHValue = intent.value) }
+                updateCurrentItemTotal()
+            }
+            is CreateEstimateUiIntent.OnItemPartPriceChange -> {
+                _uiState.update { it.copy(itemPartPrice = intent.value) }
+                updateCurrentItemTotal()
+            }
             CreateEstimateUiIntent.AddItem -> addItem()
             CreateEstimateUiIntent.SaveEstimate -> saveEstimate()
             CreateEstimateUiIntent.GeneratePdf -> generatePdf()
@@ -215,6 +249,7 @@ class CreateEstimateViewModel @Inject constructor(
                                 itemRHValue = suggestion.r.toString()
                             )
                         }
+                        updateCurrentItemTotal()
                     }
                 } catch (e: Exception) {
                     // Handle error
@@ -223,20 +258,39 @@ class CreateEstimateViewModel @Inject constructor(
         }
     }
 
+    private fun updateCurrentItemTotal() {
+        val state = _uiState.value
+        val mo = state.moHourValue.replace(",", ".").toDoubleOrNull() ?: 0.0
+        val pi = state.paintingHourValue.replace(",", ".").toDoubleOrNull() ?: 0.0
+
+        val hoursT = if (state.itemTH) state.itemTHValue.replace(",", ".").toDoubleOrNull() ?: 0.0 else 0.0
+        val hoursRi = if (state.itemRiH) state.itemRiHValue.replace(",", ".").toDoubleOrNull() ?: 0.0 else 0.0
+        val hoursR = if (state.itemRH) state.itemRHValue.replace(",", ".").toDoubleOrNull() ?: 0.0 else 0.0
+        val hoursP = if (state.itemPH) state.itemPHValue.replace(",", ".").toDoubleOrNull() ?: 0.0 else 0.0
+
+        val partPrice = state.itemPartPrice.replace(",", ".").toDoubleOrNull() ?: 0.0
+        
+        val total = (hoursT * mo) + (hoursRi * mo) + (hoursR * mo) + (hoursP * pi) + partPrice
+
+        _uiState.update { 
+            it.copy(itemTotal = String.format(Locale("pt", "BR"), "%.2f", total))
+        }
+    }
+
     private fun addItem() {
         val state = _uiState.value
         val mo = state.moHourValue.replace(",", ".").toDoubleOrNull() ?: 80.0
         val pi = state.paintingHourValue.replace(",", ".").toDoubleOrNull() ?: 100.0
 
-        val hoursT = state.itemTHValue.replace(",", ".").toDoubleOrNull() ?: 0.0
-        val hoursRi = state.itemRiHValue.replace(",", ".").toDoubleOrNull() ?: 0.0
-        val hoursR = state.itemRHValue.replace(",", ".").toDoubleOrNull() ?: 0.0
-        val hoursP = state.itemPHValue.replace(",", ".").toDoubleOrNull() ?: 0.0
+        val hoursT = if (state.itemTH) state.itemTHValue.replace(",", ".").toDoubleOrNull() ?: 0.0 else 0.0
+        val hoursRi = if (state.itemRiH) state.itemRiHValue.replace(",", ".").toDoubleOrNull() ?: 0.0 else 0.0
+        val hoursR = if (state.itemRH) state.itemRHValue.replace(",", ".").toDoubleOrNull() ?: 0.0 else 0.0
+        val hoursP = if (state.itemPH) state.itemPHValue.replace(",", ".").toDoubleOrNull() ?: 0.0 else 0.0
 
-        val valT = if (state.itemTH) hoursT * mo else 0.0
-        val valRi = if (state.itemRiH) hoursRi * mo else 0.0
-        val valR = if (state.itemRH) hoursR * mo else 0.0
-        val valP = if (state.itemPH) hoursP * pi else 0.0
+        val valT = hoursT * mo
+        val valRi = hoursRi * mo
+        val valR = hoursR * mo
+        val valP = hoursP * pi
         val unitPrice = state.itemPartPrice.replace(",", ".").toDoubleOrNull() ?: 0.0
 
         val total = valT + valRi + valR + valP + unitPrice
@@ -253,6 +307,10 @@ class CreateEstimateViewModel @Inject constructor(
             selR = if (state.itemRH) 1 else 0,
             selP = if (state.itemPH) 1 else 0,
             unitPrice = unitPrice,
+            valueT = valT,
+            valueRi = valRi,
+            valueR = valR,
+            valueP = valP,
             totalValue = total
         )
 
@@ -269,7 +327,8 @@ class CreateEstimateViewModel @Inject constructor(
                 itemRHValue = "",
                 itemPH = false,
                 itemPHValue = "",
-                itemPartPrice = ""
+                itemPartPrice = "0,00",
+                itemTotal = "0,00"
             ) 
         }
     }

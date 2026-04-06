@@ -552,8 +552,10 @@ private fun CreateEstimateContent(
             Spacer(modifier = Modifier.height(12.dp))
             EstimateInputField(
                 label = stringResource(R.string.item_total_label),
-                value = "", // This should be calculated
-                onValueChange = {})
+                value = uiState.itemTotal,
+                onValueChange = {},
+                readOnly = true
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
             Button(
@@ -658,6 +660,7 @@ private fun EstimateSectionHeader(title: String) {
  * @param modifier The modifier to be applied to the input field.
  * @param placeholder The placeholder to be displayed in the input field.
  * @param keyboardOptions The keyboard options to be applied to the input field.
+ * @param readOnly Whether the input field is read-only.
  */
 @Composable
 private fun EstimateInputField(
@@ -666,7 +669,8 @@ private fun EstimateInputField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     placeholder: String? = null,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    readOnly: Boolean = false
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
@@ -691,7 +695,8 @@ private fun EstimateInputField(
                 unfocusedBorderColor = GarageDivider
             ),
             singleLine = true,
-            keyboardOptions = keyboardOptions
+            keyboardOptions = keyboardOptions,
+            readOnly = readOnly
         )
     }
 }
