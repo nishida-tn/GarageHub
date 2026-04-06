@@ -13,6 +13,13 @@ data class EstimateDetailResponse(
 )
 
 @Serializable
+data class CreateEstimateResponse(
+    @SerialName("ok") val ok: Boolean,
+    @SerialName("id") val id: Int? = null,
+    @SerialName("error") val error: String? = null
+)
+
+@Serializable
 data class EstimateFullDto(
     @SerialName("id") val id: Int,
     @SerialName("titulo") val title: String? = null,

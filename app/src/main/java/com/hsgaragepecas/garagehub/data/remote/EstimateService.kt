@@ -1,6 +1,7 @@
 package com.hsgaragepecas.garagehub.data.remote
 
 import com.hsgaragepecas.garagehub.data.model.CreateDemandRequest
+import com.hsgaragepecas.garagehub.data.model.CreateEstimateResponse
 import com.hsgaragepecas.garagehub.data.model.EstimateDetailResponse
 import com.hsgaragepecas.garagehub.data.model.EstimateListResponse
 import com.hsgaragepecas.garagehub.data.model.EstimateUpdateRequest
@@ -50,12 +51,12 @@ interface EstimateService {
      * Creates a new estimate.
      *
      * @param request The create request.
-     * @return The estimate detail response.
+     * @return The create estimate response.
      */
     @POST("oficina/orcamentos")
     suspend fun createEstimate(
         @Body request: EstimateUpdateRequest
-    ): Map<String, Any>
+    ): CreateEstimateResponse
 
     /**
      * Updates an estimate.
@@ -101,7 +102,7 @@ interface EstimateService {
     @POST("oficina/pedidos/from-orcamento/{orc_id}")
     suspend fun generateOrders(
         @Path("orc_id") estimateId: Int
-    ): Map<String, Any>
+    ): Map<String, kotlinx.serialization.json.JsonElement>
 
     /**
      * Checks if an item can be deleted from an estimate.
@@ -114,7 +115,7 @@ interface EstimateService {
     suspend fun checkItemDeletion(
         @Path("orc_id") estimateId: Int,
         @Path("item_id") itemId: Int
-    ): Map<String, Any>
+    ): Map<String, kotlinx.serialization.json.JsonElement>
 
     /**
      * Creates a demand for an estimate.
@@ -125,5 +126,5 @@ interface EstimateService {
     @POST("oficina/demandas")
     suspend fun createDemand(
         @Body request: CreateDemandRequest
-    ): Map<String, Any>
+    ): Map<String, kotlinx.serialization.json.JsonElement>
 }

@@ -242,10 +242,8 @@ class CreateEstimateViewModel @Inject constructor(
         val total = valT + valRi + valR + valP + unitPrice
 
         val newItem = EstimateItemDto(
-            partName = state.itemPartName,
             genuineCode = state.itemGenuineCode,
-            unitPrice = unitPrice,
-            quantity = 1,
+            partName = state.itemPartName,
             hoursT = hoursT,
             hoursRi = hoursRi,
             hoursR = hoursR,
@@ -254,18 +252,15 @@ class CreateEstimateViewModel @Inject constructor(
             selRi = if (state.itemRiH) 1 else 0,
             selR = if (state.itemRH) 1 else 0,
             selP = if (state.itemPH) 1 else 0,
-            valueT = valT,
-            valueRi = valRi,
-            valueR = valR,
-            valueP = valP,
+            unitPrice = unitPrice,
             totalValue = total
         )
 
         _uiState.update { 
             it.copy(
                 items = it.items + newItem,
-                itemPartName = "",
                 itemGenuineCode = "",
+                itemPartName = "",
                 itemTH = false,
                 itemTHValue = "",
                 itemRiH = false,
@@ -274,29 +269,18 @@ class CreateEstimateViewModel @Inject constructor(
                 itemRHValue = "",
                 itemPH = false,
                 itemPHValue = "",
-                itemPartPrice = "0,00"
-            )
-        }
-        viewModelScope.launch {
-            _uiEvent.send(CreateEstimateUiEvent.ShowToast("Item adicionado"))
+                itemPartPrice = ""
+            ) 
         }
     }
 
     private fun saveEstimate() {
         val state = _uiState.value
-        if (state.clientName.isBlank()) {
-            viewModelScope.launch {
-                _uiEvent.send(CreateEstimateUiEvent.ShowToast("O nome do cliente é obrigatório"))
-            }
-            return
-        }
-
+        _uiState.update { it.copy(isSaving = true) }
         viewModelScope.launch {
-            _uiState.update { it.copy(isSaving = true) }
             try {
                 val request = EstimateUpdateRequest(
-                    title = state.vehiclePlate.ifBlank { state.clientName },
-                    description = "",
+                    title = "Orçamento - ${state.clientName}",
                     moHourValue = state.moHourValue.replace(",", ".").toDoubleOrNull(),
                     paintingHourValue = state.paintingHourValue.replace(",", ".").toDoubleOrNull(),
                     clientName = state.clientName,
@@ -324,7 +308,7 @@ class CreateEstimateViewModel @Inject constructor(
                     items = state.items
                 )
                 val response = createEstimateUseCase(request)
-                if (response["ok"] == true) {
+                if (response.ok) {
                     _uiEvent.send(CreateEstimateUiEvent.ShowToast("Orçamento criado com sucesso"))
                     _uiEvent.send(CreateEstimateUiEvent.NavigateBack)
                 } else {

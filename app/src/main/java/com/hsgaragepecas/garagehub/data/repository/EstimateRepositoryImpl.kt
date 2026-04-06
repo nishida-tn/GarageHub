@@ -1,6 +1,7 @@
 package com.hsgaragepecas.garagehub.data.repository
 
 import com.hsgaragepecas.garagehub.data.model.CreateDemandRequest
+import com.hsgaragepecas.garagehub.data.model.CreateEstimateResponse
 import com.hsgaragepecas.garagehub.data.model.EstimateDetailResponse
 import com.hsgaragepecas.garagehub.data.model.EstimateListResponse
 import com.hsgaragepecas.garagehub.data.model.EstimateUpdateRequest
@@ -31,7 +32,7 @@ class EstimateRepositoryImpl @Inject constructor(
         return estimateService.getEstimateDetail(estimateId)
     }
 
-    override suspend fun createEstimate(request: EstimateUpdateRequest): Map<String, Any> {
+    override suspend fun createEstimate(request: EstimateUpdateRequest): CreateEstimateResponse {
         return estimateService.createEstimate(request)
     }
 

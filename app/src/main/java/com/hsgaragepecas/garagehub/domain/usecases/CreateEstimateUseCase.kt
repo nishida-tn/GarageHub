@@ -1,5 +1,6 @@
 package com.hsgaragepecas.garagehub.domain.usecases
 
+import com.hsgaragepecas.garagehub.data.model.CreateEstimateResponse
 import com.hsgaragepecas.garagehub.data.model.EstimateUpdateRequest
 import com.hsgaragepecas.garagehub.domain.repository.EstimateRepository
 import javax.inject.Inject
@@ -16,9 +17,9 @@ class CreateEstimateUseCase @Inject constructor(
      * Invokes the use case.
      *
      * @param request The estimate create request.
-     * @return A map with the result from the API.
+     * @return The response from the API.
      */
-    suspend operator fun invoke(request: EstimateUpdateRequest): Map<String, Any> {
+    suspend operator fun invoke(request: EstimateUpdateRequest): CreateEstimateResponse {
         return estimateRepository.createEstimate(request)
     }
 }

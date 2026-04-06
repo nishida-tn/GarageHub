@@ -1,6 +1,7 @@
 package com.hsgaragepecas.garagehub.domain.repository
 
 import com.hsgaragepecas.garagehub.data.model.CreateDemandRequest
+import com.hsgaragepecas.garagehub.data.model.CreateEstimateResponse
 import com.hsgaragepecas.garagehub.data.model.EstimateDetailResponse
 import com.hsgaragepecas.garagehub.data.model.EstimateListResponse
 import com.hsgaragepecas.garagehub.data.model.EstimateUpdateRequest
@@ -39,9 +40,9 @@ interface EstimateRepository {
      * Creates a new estimate.
      *
      * @param request The create request.
-     * @return A map with the result.
+     * @return The create estimate response.
      */
-    suspend fun createEstimate(request: EstimateUpdateRequest): Map<String, Any>
+    suspend fun createEstimate(request: EstimateUpdateRequest): CreateEstimateResponse
 
     /**
      * Updates an estimate.
