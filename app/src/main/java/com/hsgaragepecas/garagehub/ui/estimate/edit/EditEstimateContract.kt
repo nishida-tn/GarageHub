@@ -1,5 +1,6 @@
 package com.hsgaragepecas.garagehub.ui.estimate.edit
 
+import android.net.Uri
 import com.hsgaragepecas.garagehub.data.model.EstimateFullDto
 import com.hsgaragepecas.garagehub.data.model.EstimateItemDto
 import com.hsgaragepecas.garagehub.data.model.ProposalDto
@@ -37,6 +38,13 @@ interface EditEstimateContract {
          * Event to navigate back.
          */
         data object NavigateBack : EditEstimateUiEvent
+
+        /**
+         * Event to open a file URI.
+         *
+         * @param uri The URI to open.
+         */
+        data class OpenUri(val uri: Uri) : EditEstimateUiEvent
     }
 
     /**

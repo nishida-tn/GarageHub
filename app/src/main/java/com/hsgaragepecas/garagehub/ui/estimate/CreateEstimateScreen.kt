@@ -2,9 +2,10 @@ package com.hsgaragepecas.garagehub.ui.estimate
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Environment
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -36,13 +37,13 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,6 +66,7 @@ import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.hsgaragepecas.garagehub.R
+import com.hsgaragepecas.garagehub.ui.estimate.CreateEstimateContract.CreateEstimateUiEvent
 import com.hsgaragepecas.garagehub.ui.estimate.CreateEstimateContract.CreateEstimateUiIntent
 import com.hsgaragepecas.garagehub.ui.estimate.CreateEstimateContract.CreateEstimateUiState
 import com.hsgaragepecas.garagehub.ui.theme.GarageDivider
@@ -86,6 +88,27 @@ fun CreateEstimateScreen(
     viewModel: CreateEstimateViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is CreateEstimateUiEvent.ShowToast -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+                CreateEstimateUiEvent.NavigateBack -> {
+                    // This should be handled by the navigator, but for now we'll just show a toast
+                }
+                is CreateEstimateUiEvent.OpenUri -> {
+                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                        setDataAndType(event.uri, "application/pdf")
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+                    context.startActivity(Intent.createChooser(intent, "Abrir PDF"))
+                }
+            }
+        }
+    }
 
     CreateEstimateContent(
         uiState = uiState,
@@ -500,7 +523,7 @@ private fun CreateEstimateContent(
 
             Spacer(modifier = Modifier.height(16.dp))
             Button(
-                onClick = { },
+                onClick = { onIntent(CreateEstimateUiIntent.AddItem) },
                 colors = ButtonDefaults.buttonColors(containerColor = GarageYellow),
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier.align(Alignment.End)
@@ -538,16 +561,19 @@ private fun CreateEstimateContent(
             ) {
                 ActionButton(
                     text = stringResource(R.string.generate_pdf_button),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    onClick = { onIntent(CreateEstimateUiIntent.GeneratePdf) }
                 )
                 ActionButton(
                     text = stringResource(R.string.send_whatsapp_button),
-                    modifier = Modifier.weight(1.3f)
+                    modifier = Modifier.weight(1.3f),
+                    onClick = { /* Handle WhatsApp */ }
                 )
                 ActionButton(
                     text = stringResource(R.string.demand_button),
                     modifier = Modifier.weight(1f),
-                    containerColor = Color(0xFF0D6EFD)
+                    containerColor = Color(0xFF0D6EFD),
+                    onClick = { /* Handle Demand */ }
                 )
             }
 
@@ -755,15 +781,17 @@ private fun ItemCheckBoxWithInput(
  * @param text The text to be displayed on the button.
  * @param modifier The modifier to be applied to the button.
  * @param containerColor The container color of the button.
+ * @param onClick A lambda to be called when the button is clicked.
  */
 @Composable
 private fun ActionButton(
     text: String,
     modifier: Modifier = Modifier,
-    containerColor: Color = Color(0xFF212529)
+    containerColor: Color = Color(0xFF212529),
+    onClick: () -> Unit = {}
 ) {
     Button(
-        onClick = { },
+        onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = containerColor),
         shape = RoundedCornerShape(8.dp),
         modifier = modifier.height(40.dp),

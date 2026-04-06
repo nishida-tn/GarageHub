@@ -7,18 +7,15 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    id("dagger.hilt.android.plugin")
 }
 
 android {
     namespace = "com.hsgaragepecas.garagehub"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.hsgaragepecas.garagehub"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -42,8 +39,11 @@ android {
     buildFeatures {
         compose = true
     }
-    packagingOptions {
-        resources.excludes.add("META-INF/gradle/incremental.annotation.processors")
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/gradle/incremental.annotation.processors"
+        }
     }
 }
 
@@ -76,6 +76,7 @@ dependencies {
     implementation(libs.okhttp.logging.interceptor)
     implementation(libs.retrofit.kotlinx.serialization.converter)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.itextg)
 
     kapt(libs.hilt.compiler)
     kapt(libs.hilt.android.compiler)

@@ -1,6 +1,7 @@
 package com.hsgaragepecas.garagehub.ui.estimate
 
 import android.net.Uri
+import com.hsgaragepecas.garagehub.data.model.EstimateItemDto
 
 /**
  * The contract for the create estimate screen.
@@ -37,6 +38,8 @@ interface CreateEstimateContract {
         val vehicleSteering: String = "",
         val vehicleTransmission: String = "",
         val vehiclePhotos: List<Uri> = emptyList(),
+        // Items
+        val items: List<EstimateItemDto> = emptyList(),
         // Item Data (Current item being added)
         val itemGenuineCode: String = "",
         val itemPartName: String = "",
@@ -55,6 +58,7 @@ interface CreateEstimateContract {
     sealed interface CreateEstimateUiEvent {
         data class ShowToast(val message: String) : CreateEstimateUiEvent
         data object NavigateBack : CreateEstimateUiEvent
+        data class OpenUri(val uri: Uri) : CreateEstimateUiEvent
     }
 
     /**
@@ -95,6 +99,8 @@ interface CreateEstimateContract {
         data class OnItemPHChange(val value: Boolean) : CreateEstimateUiIntent
         data class OnItemPartPriceChange(val value: String) : CreateEstimateUiIntent
         
+        data object AddItem : CreateEstimateUiIntent
         data object SaveEstimate : CreateEstimateUiIntent
+        data object GeneratePdf : CreateEstimateUiIntent
     }
 }

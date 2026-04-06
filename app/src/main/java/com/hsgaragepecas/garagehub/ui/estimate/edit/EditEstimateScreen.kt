@@ -1,11 +1,11 @@
 package com.hsgaragepecas.garagehub.ui.estimate.edit
 
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,7 +35,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -51,16 +50,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.hsgaragepecas.garagehub.R
 import com.hsgaragepecas.garagehub.data.model.EstimateFullDto
 import com.hsgaragepecas.garagehub.data.model.EstimateItemDto
+import com.hsgaragepecas.garagehub.ui.estimate.edit.EditEstimateContract.EditEstimateUiEvent
 import com.hsgaragepecas.garagehub.ui.estimate.edit.EditEstimateContract.EditEstimateUiIntent
 import com.hsgaragepecas.garagehub.ui.estimate.edit.EditEstimateContract.EditEstimateUiState
 import com.hsgaragepecas.garagehub.ui.theme.GarageHubTheme
@@ -73,9 +72,28 @@ fun EditEstimateScreen(
     onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
     LaunchedEffect(estimateId) {
         viewModel.onIntent(EditEstimateUiIntent.LoadEstimate(estimateId))
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is EditEstimateUiEvent.ShowToast -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+                EditEstimateUiEvent.NavigateBack -> onNavigateBack()
+                is EditEstimateUiEvent.OpenUri -> {
+                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                        setDataAndType(event.uri, "application/pdf")
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+                    context.startActivity(Intent.createChooser(intent, "Abrir PDF"))
+                }
+            }
+        }
     }
 
     EditEstimateContent(

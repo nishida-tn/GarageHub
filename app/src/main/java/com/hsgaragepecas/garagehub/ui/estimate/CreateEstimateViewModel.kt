@@ -2,12 +2,16 @@ package com.hsgaragepecas.garagehub.ui.estimate
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hsgaragepecas.garagehub.data.model.EstimateFullDto
+import com.hsgaragepecas.garagehub.data.model.EstimateItemDto
 import com.hsgaragepecas.garagehub.data.remote.ViaCepService
 import com.hsgaragepecas.garagehub.domain.repository.EstimateRepository
+import com.hsgaragepecas.garagehub.domain.usecases.GenerateEstimatePdfUseCase
 import com.hsgaragepecas.garagehub.ui.estimate.CreateEstimateContract.CreateEstimateUiEvent
 import com.hsgaragepecas.garagehub.ui.estimate.CreateEstimateContract.CreateEstimateUiIntent
 import com.hsgaragepecas.garagehub.ui.estimate.CreateEstimateContract.CreateEstimateUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,16 +20,22 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
  * ViewModel for the Create Estimate screen.
  * Handles the business logic and state management for creating a new estimate.
+ *
+ * @property estimateRepository The repository for estimate data.
+ * @property viaCepService The service for fetching address from CEP.
+ * @property generateEstimatePdfUseCase The use case for generating estimate PDF.
  */
 @HiltViewModel
 class CreateEstimateViewModel @Inject constructor(
     private val estimateRepository: EstimateRepository,
-    private val viaCepService: ViaCepService
+    private val viaCepService: ViaCepService,
+    private val generateEstimatePdfUseCase: GenerateEstimatePdfUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreateEstimateUiState())
@@ -81,7 +91,9 @@ class CreateEstimateViewModel @Inject constructor(
             is CreateEstimateUiIntent.OnItemRHChange -> _uiState.update { it.copy(itemRH = intent.value) }
             is CreateEstimateUiIntent.OnItemPHChange -> _uiState.update { it.copy(itemPH = intent.value) }
             is CreateEstimateUiIntent.OnItemPartPriceChange -> _uiState.update { it.copy(itemPartPrice = intent.value) }
+            CreateEstimateUiIntent.AddItem -> addItem()
             CreateEstimateUiIntent.SaveEstimate -> saveEstimate()
+            CreateEstimateUiIntent.GeneratePdf -> generatePdf()
         }
     }
 
@@ -101,7 +113,7 @@ class CreateEstimateViewModel @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                // Handle error or silent catch as in JS snippet
+                // Handle error
             }
         }
     }
@@ -118,6 +130,38 @@ class CreateEstimateViewModel @Inject constructor(
         }
     }
 
+    private fun addItem() {
+        val state = _uiState.value
+        val newItem = EstimateItemDto(
+            partName = state.itemPartName,
+            genuineCode = state.itemGenuineCode,
+            unitPrice = state.itemPartPrice.replace(",", ".").toDoubleOrNull() ?: 0.0,
+            quantity = 1,
+            valueT = if (state.itemTH) 100.0 else 0.0,
+            valueRi = if (state.itemRiH) 50.0 else 0.0,
+            valueR = if (state.itemRH) 80.0 else 0.0,
+            valueP = if (state.itemPH) 120.0 else 0.0
+        )
+        val total = (newItem.unitPrice ?: 0.0) + (newItem.valueT ?: 0.0) + (newItem.valueRi ?: 0.0) + (newItem.valueR ?: 0.0) + (newItem.valueP ?: 0.0)
+        val newItemWithTotal = newItem.copy(totalValue = total)
+
+        _uiState.update { 
+            it.copy(
+                items = it.items + newItemWithTotal,
+                itemPartName = "",
+                itemGenuineCode = "",
+                itemTH = false,
+                itemRiH = false,
+                itemRH = false,
+                itemPH = false,
+                itemPartPrice = "0,00"
+            )
+        }
+        viewModelScope.launch {
+            _uiEvent.send(CreateEstimateUiEvent.ShowToast("Item adicionado"))
+        }
+    }
+
     private fun saveEstimate() {
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true) }
@@ -125,6 +169,36 @@ class CreateEstimateViewModel @Inject constructor(
             _uiState.update { it.copy(isSaving = false) }
             _uiEvent.send(CreateEstimateUiEvent.ShowToast("Estimate created successfully"))
             _uiEvent.send(CreateEstimateUiEvent.NavigateBack)
+        }
+    }
+
+    private fun generatePdf() {
+        val state = _uiState.value
+        val estimate = EstimateFullDto(
+            id = 0,
+            clientName = state.clientName,
+            clientTel = state.clientTel,
+            clientAddress = state.clientAddress,
+            clientNumber = state.clientNumber,
+            clientCity = state.clientCity,
+            clientUf = state.clientUf,
+            vehiclePlate = state.vehiclePlate,
+            vehicleBrand = state.vehicleBrand,
+            vehicleModel = state.vehicleModel,
+            vehicleYearFab = state.vehicleYearFab.toIntOrNull(),
+            vehicleYearMod = state.vehicleYearMod.toIntOrNull()
+        )
+
+        viewModelScope.launch {
+            _uiEvent.send(CreateEstimateUiEvent.ShowToast("Gerando PDF..."))
+            try {
+                val uri = withContext(Dispatchers.IO) {
+                    generateEstimatePdfUseCase(estimate, state.items)
+                }
+                _uiEvent.send(CreateEstimateUiEvent.OpenUri(uri))
+            } catch (e: Exception) {
+                _uiEvent.send(CreateEstimateUiEvent.ShowToast("Erro ao gerar PDF: ${e.message}"))
+            }
         }
     }
 }

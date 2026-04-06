@@ -9,6 +9,7 @@ import com.hsgaragepecas.garagehub.data.model.EstimateUpdateRequest
 import com.hsgaragepecas.garagehub.domain.usecases.CheckItemDeletionUseCase
 import com.hsgaragepecas.garagehub.domain.usecases.CreateDemandUseCase
 import com.hsgaragepecas.garagehub.domain.usecases.DeleteEstimateUseCase
+import com.hsgaragepecas.garagehub.domain.usecases.GenerateEstimatePdfUseCase
 import com.hsgaragepecas.garagehub.domain.usecases.GenerateOrdersUseCase
 import com.hsgaragepecas.garagehub.domain.usecases.GetEstimateDetailUseCase
 import com.hsgaragepecas.garagehub.domain.usecases.GetTimeSuggestionUseCase
@@ -36,6 +37,7 @@ import javax.inject.Inject
  * @param generateOrdersUseCase The use case for generating orders.
  * @param checkItemDeletionUseCase The use case for checking item deletion.
  * @param createDemandUseCase The use case for creating a demand.
+ * @param generateEstimatePdfUseCase The use case for generating an estimate PDF.
  */
 @HiltViewModel
 class EditEstimateViewModel @Inject constructor(
@@ -45,7 +47,8 @@ class EditEstimateViewModel @Inject constructor(
     private val getTimeSuggestionUseCase: GetTimeSuggestionUseCase,
     private val generateOrdersUseCase: GenerateOrdersUseCase,
     private val checkItemDeletionUseCase: CheckItemDeletionUseCase,
-    private val createDemandUseCase: CreateDemandUseCase
+    private val createDemandUseCase: CreateDemandUseCase,
+    private val generateEstimatePdfUseCase: GenerateEstimatePdfUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(EditEstimateUiState())
@@ -179,10 +182,18 @@ class EditEstimateViewModel @Inject constructor(
     }
 
     private fun generatePdf() {
+        val estimate = _uiState.value.estimate ?: return
+        val items = _uiState.value.items
+
         viewModelScope.launch {
             _uiEvent.send(EditEstimateUiEvent.ShowToast("Gerando PDF..."))
+            try {
+                val uri = generateEstimatePdfUseCase(estimate, items)
+                _uiEvent.send(EditEstimateUiEvent.OpenUri(uri))
+            } catch (e: Exception) {
+                _uiEvent.send(EditEstimateUiEvent.ShowToast("Erro ao gerar PDF: ${e.message}"))
+            }
         }
-        // Backend doesn't have a direct PDF endpoint in the provided snippet
     }
 
     private fun sendWhatsApp() {
