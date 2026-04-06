@@ -36,10 +36,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -196,14 +200,16 @@ private fun CreateEstimateContent(
                     label = stringResource(R.string.mo_hour_value_label),
                     value = uiState.moHourValue,
                     onValueChange = { onIntent(CreateEstimateUiIntent.OnMoHourValueChange(it)) },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 EstimateInputField(
                     label = stringResource(R.string.painting_hour_value_label),
                     value = uiState.paintingHourValue,
                     onValueChange = { onIntent(CreateEstimateUiIntent.OnPaintingHourValueChange(it)) },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
             }
 
@@ -223,21 +229,24 @@ private fun CreateEstimateContent(
                     label = stringResource(R.string.customer_tel_label),
                     value = uiState.clientTel,
                     onValueChange = { onIntent(CreateEstimateUiIntent.OnClientTelChange(it)) },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 EstimateInputField(
                     label = stringResource(R.string.customer_whatsapp_label),
                     value = uiState.clientWhats,
                     onValueChange = { onIntent(CreateEstimateUiIntent.OnClientWhatsChange(it)) },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
                 )
             }
             Spacer(modifier = Modifier.height(12.dp))
             EstimateInputField(
                 label = stringResource(R.string.customer_cep_label),
                 value = uiState.clientCep,
-                onValueChange = { onIntent(CreateEstimateUiIntent.OnClientCepChange(it)) }
+                onValueChange = { onIntent(CreateEstimateUiIntent.OnClientCepChange(it)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateInputField(
@@ -251,7 +260,8 @@ private fun CreateEstimateContent(
                     label = stringResource(R.string.customer_number_label),
                     value = uiState.clientNumber,
                     onValueChange = { onIntent(CreateEstimateUiIntent.OnClientNumberChange(it)) },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 EstimateInputField(
@@ -296,34 +306,44 @@ private fun CreateEstimateContent(
             )
             Spacer(modifier = Modifier.height(12.dp))
             Row(modifier = Modifier.fillMaxWidth()) {
-                EstimateInputField(
+                EstimateDropdownField(
                     label = stringResource(R.string.vehicle_brand_label),
-                    value = uiState.vehicleBrand,
-                    onValueChange = { onIntent(CreateEstimateUiIntent.OnVehicleBrandChange(it)) },
-                    modifier = Modifier.weight(1f)
+                    options = uiState.brands,
+                    selectedOption = uiState.vehicleBrand,
+                    onOptionSelected = { onIntent(CreateEstimateUiIntent.OnBrandSelected(it)) },
+                    optionLabel = { it.name },
+                    modifier = Modifier.weight(1f),
+                    placeholder = "Selecione a marca"
                 )
                 Spacer(modifier = Modifier.width(16.dp))
-                EstimateInputField(
+                EstimateDropdownField(
                     label = stringResource(R.string.vehicle_model_label),
-                    value = uiState.vehicleModel,
-                    onValueChange = { onIntent(CreateEstimateUiIntent.OnVehicleModelChange(it)) },
-                    modifier = Modifier.weight(1f)
+                    options = uiState.models,
+                    selectedOption = uiState.vehicleModel,
+                    onOptionSelected = { onIntent(CreateEstimateUiIntent.OnModelSelected(it)) },
+                    optionLabel = { it.name },
+                    modifier = Modifier.weight(1f),
+                    placeholder = "Selecione o modelo"
                 )
             }
             Spacer(modifier = Modifier.height(12.dp))
             Row(modifier = Modifier.fillMaxWidth()) {
-                EstimateInputField(
+                EstimateDropdownField(
                     label = stringResource(R.string.vehicle_manufacturing_year_label),
-                    value = uiState.vehicleYearFab,
-                    onValueChange = { onIntent(CreateEstimateUiIntent.OnVehicleYearFabChange(it)) },
-                    modifier = Modifier.weight(1f)
+                    options = uiState.years,
+                    selectedOption = uiState.selectedYear?.name ?: uiState.vehicleYearFab,
+                    onOptionSelected = { onIntent(CreateEstimateUiIntent.OnYearSelected(it)) },
+                    optionLabel = { it.name },
+                    modifier = Modifier.weight(1f),
+                    placeholder = "Selecione o ano"
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 EstimateInputField(
                     label = stringResource(R.string.vehicle_model_year_label),
                     value = uiState.vehicleYearMod,
                     onValueChange = { onIntent(CreateEstimateUiIntent.OnVehicleYearModChange(it)) },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
             }
             Spacer(modifier = Modifier.height(12.dp))
@@ -526,7 +546,8 @@ private fun CreateEstimateContent(
             EstimateInputField(
                 label = stringResource(R.string.item_part_price_label),
                 value = uiState.itemPartPrice,
-                onValueChange = { onIntent(CreateEstimateUiIntent.OnItemPartPriceChange(it)) }
+                onValueChange = { onIntent(CreateEstimateUiIntent.OnItemPartPriceChange(it)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
             Spacer(modifier = Modifier.height(12.dp))
             EstimateInputField(
@@ -636,6 +657,7 @@ private fun EstimateSectionHeader(title: String) {
  * @param onValueChange A lambda to be called when the value of the input field changes.
  * @param modifier The modifier to be applied to the input field.
  * @param placeholder The placeholder to be displayed in the input field.
+ * @param keyboardOptions The keyboard options to be applied to the input field.
  */
 @Composable
 private fun EstimateInputField(
@@ -643,7 +665,8 @@ private fun EstimateInputField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: String? = null
+    placeholder: String? = null,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
@@ -668,8 +691,84 @@ private fun EstimateInputField(
                 unfocusedBorderColor = GarageDivider
             ),
             singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            keyboardOptions = keyboardOptions
         )
+    }
+}
+
+/**
+ * A composable that displays a dropdown field for the estimate screen.
+ *
+ * @param label The label to be displayed above the dropdown field.
+ * @param options The list of options to be displayed in the dropdown.
+ * @param selectedOption The currently selected option.
+ * @param onOptionSelected A lambda to be called when an option is selected.
+ * @param optionLabel A lambda to be called to get the label for an option.
+ * @param modifier The modifier to be applied to the dropdown field.
+ * @param placeholder The placeholder to be displayed in the dropdown field.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun <T> EstimateDropdownField(
+    label: String,
+    options: List<T>,
+    selectedOption: String,
+    onOptionSelected: (T) -> Unit,
+    optionLabel: (T) -> String,
+    modifier: Modifier = Modifier,
+    placeholder: String = ""
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            OutlinedTextField(
+                value = selectedOption,
+                onValueChange = {},
+                readOnly = true,
+                placeholder = if (placeholder.isNotEmpty()) {
+                    { Text(text = placeholder, color = GarageGreyText) }
+                } else null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                shape = RoundedCornerShape(8.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedBorderColor = GarageDivider,
+                    unfocusedBorderColor = GarageDivider
+                )
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                options.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(text = optionLabel(option)) },
+                        onClick = {
+                            onOptionSelected(option)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
     }
 }
 

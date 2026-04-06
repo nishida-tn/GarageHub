@@ -2,6 +2,9 @@ package com.hsgaragepecas.garagehub.ui.estimate
 
 import android.net.Uri
 import com.hsgaragepecas.garagehub.data.model.EstimateItemDto
+import com.hsgaragepecas.garagehub.data.model.FipeBrandDto
+import com.hsgaragepecas.garagehub.data.model.FipeModelDto
+import com.hsgaragepecas.garagehub.data.model.FipeYearDto
 
 /**
  * The contract for the create estimate screen.
@@ -29,7 +32,13 @@ interface CreateEstimateContract {
         // Vehicle Data
         val vehiclePlate: String = "",
         val vehicleBrand: String = "",
+        val brands: List<FipeBrandDto> = emptyList(),
+        val selectedBrand: FipeBrandDto? = null,
         val vehicleModel: String = "",
+        val models: List<FipeModelDto> = emptyList(),
+        val selectedModel: FipeModelDto? = null,
+        val years: List<FipeYearDto> = emptyList(),
+        val selectedYear: FipeYearDto? = null,
         val vehicleYearFab: String = "",
         val vehicleYearMod: String = "",
         val vehicleChassis: String = "",
@@ -85,7 +94,10 @@ interface CreateEstimateContract {
         // Vehicle Data Intents
         data class OnVehiclePlateChange(val value: String) : CreateEstimateUiIntent
         data class OnVehicleBrandChange(val value: String) : CreateEstimateUiIntent
+        data class OnBrandSelected(val brand: FipeBrandDto) : CreateEstimateUiIntent
         data class OnVehicleModelChange(val value: String) : CreateEstimateUiIntent
+        data class OnModelSelected(val model: FipeModelDto) : CreateEstimateUiIntent
+        data class OnYearSelected(val year: FipeYearDto) : CreateEstimateUiIntent
         data class OnVehicleYearFabChange(val value: String) : CreateEstimateUiIntent
         data class OnVehicleYearModChange(val value: String) : CreateEstimateUiIntent
         data class OnVehicleChassisChange(val value: String) : CreateEstimateUiIntent

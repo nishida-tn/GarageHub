@@ -3,6 +3,7 @@ package com.hsgaragepecas.garagehub.di
 import com.hsgaragepecas.garagehub.data.local.user.UserPreferencesDataSource
 import com.hsgaragepecas.garagehub.data.remote.AuthService
 import com.hsgaragepecas.garagehub.data.remote.EstimateService
+import com.hsgaragepecas.garagehub.data.remote.FipeService
 import com.hsgaragepecas.garagehub.data.remote.ViaCepService
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
@@ -82,6 +83,12 @@ object NetworkModule {
     @Singleton
     fun provideEstimateService(retrofit: Retrofit): EstimateService {
         return retrofit.create(EstimateService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFipeService(retrofit: Retrofit): FipeService {
+        return retrofit.create(FipeService::class.java)
     }
 
     @Provides

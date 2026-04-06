@@ -1,8 +1,10 @@
 package com.hsgaragepecas.garagehub.di
 
 import com.hsgaragepecas.garagehub.data.repository.EstimateRepositoryImpl
+import com.hsgaragepecas.garagehub.data.repository.FipeRepositoryImpl
 import com.hsgaragepecas.garagehub.data.repository.OrderRepositoryImpl
 import com.hsgaragepecas.garagehub.domain.repository.EstimateRepository
+import com.hsgaragepecas.garagehub.domain.repository.FipeRepository
 import com.hsgaragepecas.garagehub.domain.repository.OrderRepository
 import dagger.Binds
 import dagger.Module
@@ -36,4 +38,14 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindEstimateRepository(estimateRepositoryImpl: EstimateRepositoryImpl): EstimateRepository
+
+    /**
+     * Binds the [FipeRepositoryImpl] to the [FipeRepository] interface.
+     *
+     * @param fipeRepositoryImpl The [FipeRepositoryImpl] instance.
+     * @return The [FipeRepository] instance.
+     */
+    @Binds
+    @Singleton
+    abstract fun bindFipeRepository(fipeRepositoryImpl: FipeRepositoryImpl): FipeRepository
 }
