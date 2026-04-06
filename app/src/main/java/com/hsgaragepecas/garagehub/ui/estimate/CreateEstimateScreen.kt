@@ -27,21 +27,26 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -58,6 +63,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -81,10 +87,12 @@ import java.util.Locale
 /**
  * A screen that allows the user to create a new estimate.
  *
+ * @param onBack A lambda to be called when the user wants to navigate back.
  * @param viewModel The ViewModel that manages the screen state.
  */
 @Composable
 fun CreateEstimateScreen(
+    onBack: () -> Unit,
     viewModel: CreateEstimateViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -97,7 +105,7 @@ fun CreateEstimateScreen(
                     Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
                 }
                 CreateEstimateUiEvent.NavigateBack -> {
-                    // This should be handled by the navigator, but for now we'll just show a toast
+                    onBack()
                 }
                 is CreateEstimateUiEvent.OpenUri -> {
                     val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -112,102 +120,90 @@ fun CreateEstimateScreen(
 
     CreateEstimateContent(
         uiState = uiState,
-        onIntent = viewModel::onIntent
+        onIntent = viewModel::onIntent,
+        onBack = onBack
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CreateEstimateContent(
     uiState: CreateEstimateUiState,
-    onIntent: (CreateEstimateUiIntent) -> Unit
+    onIntent: (CreateEstimateUiIntent) -> Unit,
+    onBack: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    val scrollState = rememberScrollState()
-
     var tempImageUri by remember { mutableStateOf<Uri?>(null) }
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = 10)
-    ) { uris ->
-        if (uris.isNotEmpty()) {
-            onIntent(CreateEstimateUiIntent.OnAddVehiclePhotos(uris))
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            uri?.let { onIntent(CreateEstimateUiIntent.OnAddVehiclePhotos(listOf(it))) }
         }
-    }
+    )
 
     val takePictureLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture()
-    ) { success ->
-        if (success) {
-            tempImageUri?.let { uri ->
-                onIntent(CreateEstimateUiIntent.OnAddVehiclePhotos(listOf(uri)))
+        contract = ActivityResultContracts.TakePicture(),
+        onResult = { success ->
+            if (success) {
+                tempImageUri?.let { onIntent(CreateEstimateUiIntent.OnAddVehiclePhotos(listOf(it))) }
             }
         }
-    }
+    )
 
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            try {
-                val uri = createTempImageUri(context)
-                tempImageUri = uri
-                takePictureLauncher.launch(uri)
-            } catch (e: Exception) {
-                e.printStackTrace()
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (isGranted) {
+                try {
+                    val uri = createTempImageUri(context)
+                    tempImageUri = uri
+                    takePictureLauncher.launch(uri)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
-    }
+    )
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.new_estimate_title)) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground
+                )
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.background
+    ) { padding ->
         Column(
             modifier = Modifier
+                .padding(padding)
+                .padding(horizontal = 16.dp)
                 .fillMaxSize()
-                .verticalScroll(scrollState)
-                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // New Estimate Section
-            Text(
-                text = stringResource(R.string.new_estimate_title),
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
+            // MO Hour Values
+            Row(modifier = Modifier.fillMaxWidth()) {
                 EstimateInputField(
                     label = stringResource(R.string.mo_hour_value_label),
                     value = uiState.moHourValue,
                     onValueChange = { onIntent(CreateEstimateUiIntent.OnMoHourValueChange(it)) },
                     modifier = Modifier.weight(1f)
                 )
+                Spacer(modifier = Modifier.width(16.dp))
                 EstimateInputField(
                     label = stringResource(R.string.painting_hour_value_label),
                     value = uiState.paintingHourValue,
                     onValueChange = { onIntent(CreateEstimateUiIntent.OnPaintingHourValueChange(it)) },
                     modifier = Modifier.weight(1f)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = { },
-                colors = ButtonDefaults.buttonColors(containerColor = GarageYellow),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.save_values_button),
-                    color = Color.Black,
-                    fontWeight = FontWeight.Bold
                 )
             }
 
@@ -222,17 +218,21 @@ private fun CreateEstimateContent(
                 onValueChange = { onIntent(CreateEstimateUiIntent.OnClientNameChange(it)) }
             )
             Spacer(modifier = Modifier.height(12.dp))
-            EstimateInputField(
-                label = stringResource(R.string.customer_tel_label),
-                value = uiState.clientTel,
-                onValueChange = { onIntent(CreateEstimateUiIntent.OnClientTelChange(it)) }
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            EstimateInputField(
-                label = stringResource(R.string.customer_whatsapp_label),
-                value = uiState.clientWhats,
-                onValueChange = { onIntent(CreateEstimateUiIntent.OnClientWhatsChange(it)) }
-            )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                EstimateInputField(
+                    label = stringResource(R.string.customer_tel_label),
+                    value = uiState.clientTel,
+                    onValueChange = { onIntent(CreateEstimateUiIntent.OnClientTelChange(it)) },
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                EstimateInputField(
+                    label = stringResource(R.string.customer_whatsapp_label),
+                    value = uiState.clientWhats,
+                    onValueChange = { onIntent(CreateEstimateUiIntent.OnClientWhatsChange(it)) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
             Spacer(modifier = Modifier.height(12.dp))
             EstimateInputField(
                 label = stringResource(R.string.customer_cep_label),
@@ -246,29 +246,37 @@ private fun CreateEstimateContent(
                 onValueChange = { onIntent(CreateEstimateUiIntent.OnClientAddressChange(it)) }
             )
             Spacer(modifier = Modifier.height(12.dp))
-            EstimateInputField(
-                label = stringResource(R.string.customer_number_label),
-                value = uiState.clientNumber,
-                onValueChange = { onIntent(CreateEstimateUiIntent.OnClientNumberChange(it)) }
-            )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                EstimateInputField(
+                    label = stringResource(R.string.customer_number_label),
+                    value = uiState.clientNumber,
+                    onValueChange = { onIntent(CreateEstimateUiIntent.OnClientNumberChange(it)) },
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                EstimateInputField(
+                    label = stringResource(R.string.customer_neighborhood_label),
+                    value = uiState.clientNeighborhood,
+                    onValueChange = { onIntent(CreateEstimateUiIntent.OnClientNeighborhoodChange(it)) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
             Spacer(modifier = Modifier.height(12.dp))
-            EstimateInputField(
-                label = stringResource(R.string.customer_neighborhood_label),
-                value = uiState.clientNeighborhood,
-                onValueChange = { onIntent(CreateEstimateUiIntent.OnClientNeighborhoodChange(it)) }
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            EstimateInputField(
-                label = stringResource(R.string.customer_city_label),
-                value = uiState.clientCity,
-                onValueChange = { onIntent(CreateEstimateUiIntent.OnClientCityChange(it)) }
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            EstimateInputField(
-                label = stringResource(R.string.customer_uf_label),
-                value = uiState.clientUf,
-                onValueChange = { onIntent(CreateEstimateUiIntent.OnClientUfChange(it)) }
-            )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                EstimateInputField(
+                    label = stringResource(R.string.customer_city_label),
+                    value = uiState.clientCity,
+                    onValueChange = { onIntent(CreateEstimateUiIntent.OnClientCityChange(it)) },
+                    modifier = Modifier.weight(2f)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                EstimateInputField(
+                    label = stringResource(R.string.customer_uf_label),
+                    value = uiState.clientUf,
+                    onValueChange = { onIntent(CreateEstimateUiIntent.OnClientUfChange(it)) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
             Spacer(modifier = Modifier.height(12.dp))
             EstimateInputField(
                 label = stringResource(R.string.customer_complement_label),
@@ -287,43 +295,37 @@ private fun CreateEstimateContent(
                 onValueChange = { onIntent(CreateEstimateUiIntent.OnVehiclePlateChange(it)) }
             )
             Spacer(modifier = Modifier.height(12.dp))
-            
-            // Placeholder for brand/model/years - in a real app these would come from an API
-            val dummyBrands = listOf("Volkswagen", "Fiat", "Chevrolet", "Ford", "Toyota", "Honda", "Hyundai")
-            val dummyModels = listOf("Gol", "Uno", "Onix", "Ka", "Corolla", "Civic", "HB20")
-            val dummyYears = (2000..2025).map { it.toString() }.reversed()
-            val fuelOptions = listOf("Gasolina", "Álcool", "Flex", "Diesel", "GNV", "Elétrico", "Híbrido")
-            val airOptions = listOf("Sim", "Não")
-            val steeringOptions = listOf("Hidráulica", "Elétrica", "Mecânica", "Eletro-hidráulica")
-            val transmissionOptions = listOf("Manual", "Automático", "CVT", "Automatizado")
-
-            EstimateDropdownField(
-                label = stringResource(R.string.vehicle_brand_label),
-                selectedOption = if (uiState.vehicleBrand.isEmpty()) stringResource(R.string.select_option) else uiState.vehicleBrand,
-                options = dummyBrands,
-                onOptionSelected = { onIntent(CreateEstimateUiIntent.OnVehicleBrandChange(it)) }
-            )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                EstimateInputField(
+                    label = stringResource(R.string.vehicle_brand_label),
+                    value = uiState.vehicleBrand,
+                    onValueChange = { onIntent(CreateEstimateUiIntent.OnVehicleBrandChange(it)) },
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                EstimateInputField(
+                    label = stringResource(R.string.vehicle_model_label),
+                    value = uiState.vehicleModel,
+                    onValueChange = { onIntent(CreateEstimateUiIntent.OnVehicleModelChange(it)) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
             Spacer(modifier = Modifier.height(12.dp))
-            EstimateDropdownField(
-                label = stringResource(R.string.vehicle_model_label),
-                selectedOption = if (uiState.vehicleModel.isEmpty()) stringResource(R.string.select_brand_option) else uiState.vehicleModel,
-                options = dummyModels,
-                onOptionSelected = { onIntent(CreateEstimateUiIntent.OnVehicleModelChange(it)) }
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            EstimateDropdownField(
-                label = stringResource(R.string.vehicle_manufacturing_year_label),
-                selectedOption = if (uiState.vehicleYearFab.isEmpty()) stringResource(R.string.select_model_option) else uiState.vehicleYearFab,
-                options = dummyYears,
-                onOptionSelected = { onIntent(CreateEstimateUiIntent.OnVehicleYearFabChange(it)) }
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            EstimateDropdownField(
-                label = stringResource(R.string.vehicle_model_year_label),
-                selectedOption = if (uiState.vehicleYearMod.isEmpty()) stringResource(R.string.select_model_option) else uiState.vehicleYearMod,
-                options = dummyYears,
-                onOptionSelected = { onIntent(CreateEstimateUiIntent.OnVehicleYearModChange(it)) }
-            )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                EstimateInputField(
+                    label = stringResource(R.string.vehicle_manufacturing_year_label),
+                    value = uiState.vehicleYearFab,
+                    onValueChange = { onIntent(CreateEstimateUiIntent.OnVehicleYearFabChange(it)) },
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                EstimateInputField(
+                    label = stringResource(R.string.vehicle_model_year_label),
+                    value = uiState.vehicleYearMod,
+                    onValueChange = { onIntent(CreateEstimateUiIntent.OnVehicleYearModChange(it)) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
             Spacer(modifier = Modifier.height(12.dp))
             EstimateInputField(
                 label = stringResource(R.string.vehicle_chassis_label),
@@ -331,36 +333,39 @@ private fun CreateEstimateContent(
                 onValueChange = { onIntent(CreateEstimateUiIntent.OnVehicleChassisChange(it)) }
             )
             Spacer(modifier = Modifier.height(12.dp))
-            EstimateDropdownField(
-                label = stringResource(R.string.vehicle_fuel_label),
-                selectedOption = if (uiState.vehicleFuel.isEmpty()) stringResource(R.string.select_option) else uiState.vehicleFuel,
-                options = fuelOptions,
-                onOptionSelected = { onIntent(CreateEstimateUiIntent.OnVehicleFuelChange(it)) }
-            )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                EstimateInputField(
+                    label = stringResource(R.string.vehicle_fuel_label),
+                    value = uiState.vehicleFuel,
+                    onValueChange = { onIntent(CreateEstimateUiIntent.OnVehicleFuelChange(it)) },
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                EstimateInputField(
+                    label = stringResource(R.string.vehicle_air_conditioning_label),
+                    value = uiState.vehicleAir,
+                    onValueChange = { onIntent(CreateEstimateUiIntent.OnVehicleAirChange(it)) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
             Spacer(modifier = Modifier.height(12.dp))
-            EstimateDropdownField(
-                label = stringResource(R.string.vehicle_air_conditioning_label),
-                selectedOption = if (uiState.vehicleAir.isEmpty()) stringResource(R.string.select_option) else uiState.vehicleAir,
-                options = airOptions,
-                onOptionSelected = { onIntent(CreateEstimateUiIntent.OnVehicleAirChange(it)) }
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            EstimateDropdownField(
-                label = stringResource(R.string.vehicle_steering_label),
-                selectedOption = if (uiState.vehicleSteering.isEmpty()) stringResource(R.string.select_option) else uiState.vehicleSteering,
-                options = steeringOptions,
-                onOptionSelected = { onIntent(CreateEstimateUiIntent.OnVehicleSteeringChange(it)) }
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            EstimateDropdownField(
-                label = stringResource(R.string.vehicle_transmission_label),
-                selectedOption = if (uiState.vehicleTransmission.isEmpty()) stringResource(R.string.select_option) else uiState.vehicleTransmission,
-                options = transmissionOptions,
-                onOptionSelected = { onIntent(CreateEstimateUiIntent.OnVehicleTransmissionChange(it)) }
-            )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                EstimateInputField(
+                    label = stringResource(R.string.vehicle_steering_label),
+                    value = uiState.vehicleSteering,
+                    onValueChange = { onIntent(CreateEstimateUiIntent.OnVehicleSteeringChange(it)) },
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                EstimateInputField(
+                    label = stringResource(R.string.vehicle_transmission_label),
+                    value = uiState.vehicleTransmission,
+                    onValueChange = { onIntent(CreateEstimateUiIntent.OnVehicleTransmissionChange(it)) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
-
             Text(
                 text = stringResource(R.string.vehicle_photos_label),
                 style = TextStyle(
@@ -491,22 +496,30 @@ private fun CreateEstimateContent(
             ItemCheckBoxWithInput(
                 label = stringResource(R.string.item_t_h_label),
                 checked = uiState.itemTH,
-                onCheckedChange = { onIntent(CreateEstimateUiIntent.OnItemTHChange(it)) }
+                onCheckedChange = { onIntent(CreateEstimateUiIntent.OnItemTHChange(it)) },
+                value = uiState.itemTHValue,
+                onValueChange = { onIntent(CreateEstimateUiIntent.OnItemTHValueChange(it)) }
             )
             ItemCheckBoxWithInput(
                 label = stringResource(R.string.item_ri_h_label),
                 checked = uiState.itemRiH,
-                onCheckedChange = { onIntent(CreateEstimateUiIntent.OnItemRiHChange(it)) }
+                onCheckedChange = { onIntent(CreateEstimateUiIntent.OnItemRiHChange(it)) },
+                value = uiState.itemRiHValue,
+                onValueChange = { onIntent(CreateEstimateUiIntent.OnItemRiHValueChange(it)) }
             )
             ItemCheckBoxWithInput(
                 label = stringResource(R.string.item_r_h_label),
                 checked = uiState.itemRH,
-                onCheckedChange = { onIntent(CreateEstimateUiIntent.OnItemRHChange(it)) }
+                onCheckedChange = { onIntent(CreateEstimateUiIntent.OnItemRHChange(it)) },
+                value = uiState.itemRHValue,
+                onValueChange = { onIntent(CreateEstimateUiIntent.OnItemRHValueChange(it)) }
             )
             ItemCheckBoxWithInput(
                 label = stringResource(R.string.item_p_h_label),
                 checked = uiState.itemPH,
-                onCheckedChange = { onIntent(CreateEstimateUiIntent.OnItemPHChange(it)) }
+                onCheckedChange = { onIntent(CreateEstimateUiIntent.OnItemPHChange(it)) },
+                value = uiState.itemPHValue,
+                onValueChange = { onIntent(CreateEstimateUiIntent.OnItemPHValueChange(it)) }
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -654,73 +667,9 @@ private fun EstimateInputField(
                 focusedBorderColor = GarageDivider,
                 unfocusedBorderColor = GarageDivider
             ),
-            singleLine = true
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
-    }
-}
-
-/**
- * A composable that displays a dropdown field for the estimate screen.
- *
- * @param label The label to be displayed above the dropdown field.
- * @param selectedOption The currently selected option in the dropdown field.
- * @param options The list of options to be displayed in the dropdown menu.
- * @param onOptionSelected A lambda to be called when an option is selected.
- * @param modifier The modifier to be applied to the dropdown field.
- */
-@Composable
-private fun EstimateDropdownField(
-    label: String,
-    selectedOption: String,
-    options: List<String>,
-    onOptionSelected: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Column(modifier = modifier.fillMaxWidth()) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Box {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { expanded = true },
-                color = MaterialTheme.colorScheme.surface,
-                shape = RoundedCornerShape(8.dp),
-                border = BorderStroke(1.dp, GarageDivider)
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = selectedOption, color = MaterialTheme.colorScheme.onSurface)
-                    Text(text = "▼", color = MaterialTheme.colorScheme.onSurface, fontSize = 10.sp)
-                }
-            }
-
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.fillMaxWidth(0.9f)
-            ) {
-                options.forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text(text = option) },
-                        onClick = {
-                            onOptionSelected(option)
-                            expanded = false
-                        }
-                    )
-                }
-            }
-        }
     }
 }
 
@@ -730,12 +679,16 @@ private fun EstimateDropdownField(
  * @param label The label to be displayed next to the checkbox.
  * @param checked Whether the checkbox is checked.
  * @param onCheckedChange A lambda to be called when the checked state changes.
+ * @param value The value of the input field.
+ * @param onValueChange A lambda to be called when the value of the input field changes.
  */
 @Composable
 private fun ItemCheckBoxWithInput(
     label: String,
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
+    value: String,
+    onValueChange: (String) -> Unit
 ) {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -755,8 +708,8 @@ private fun ItemCheckBoxWithInput(
             )
         }
         OutlinedTextField(
-            value = "", // This would also need to be in the state if you want to track hours per action
-            onValueChange = {},
+            value = value,
+            onValueChange = onValueChange,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 12.dp),
@@ -769,7 +722,8 @@ private fun ItemCheckBoxWithInput(
                 focusedBorderColor = GarageDivider,
                 unfocusedBorderColor = GarageDivider
             ),
-            singleLine = true
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
         Spacer(modifier = Modifier.height(8.dp))
     }

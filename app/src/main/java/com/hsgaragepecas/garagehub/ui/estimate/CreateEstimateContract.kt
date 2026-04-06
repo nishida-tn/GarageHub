@@ -44,9 +44,13 @@ interface CreateEstimateContract {
         val itemGenuineCode: String = "",
         val itemPartName: String = "",
         val itemTH: Boolean = false,
+        val itemTHValue: String = "",
         val itemRiH: Boolean = false,
+        val itemRiHValue: String = "",
         val itemRH: Boolean = false,
+        val itemRHValue: String = "",
         val itemPH: Boolean = false,
+        val itemPHValue: String = "",
         val itemPartPrice: String = "0,00",
         val error: String? = null,
         val isSaving: Boolean = false
@@ -94,9 +98,13 @@ interface CreateEstimateContract {
         data class OnItemGenuineCodeChange(val value: String) : CreateEstimateUiIntent
         data class OnItemPartNameChange(val value: String) : CreateEstimateUiIntent
         data class OnItemTHChange(val value: Boolean) : CreateEstimateUiIntent
+        data class OnItemTHValueChange(val value: String) : CreateEstimateUiIntent
         data class OnItemRiHChange(val value: Boolean) : CreateEstimateUiIntent
+        data class OnItemRiHValueChange(val value: String) : CreateEstimateUiIntent
         data class OnItemRHChange(val value: Boolean) : CreateEstimateUiIntent
+        data class OnItemRHValueChange(val value: String) : CreateEstimateUiIntent
         data class OnItemPHChange(val value: Boolean) : CreateEstimateUiIntent
+        data class OnItemPHValueChange(val value: String) : CreateEstimateUiIntent
         data class OnItemPartPriceChange(val value: String) : CreateEstimateUiIntent
         
         data object AddItem : CreateEstimateUiIntent

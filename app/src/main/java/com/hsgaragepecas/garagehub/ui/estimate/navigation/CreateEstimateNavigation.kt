@@ -9,7 +9,9 @@ import com.hsgaragepecas.garagehub.ui.estimate.CreateEstimateScreen
 
 fun NavGraphBuilder.createEstimateScreen(navController: NavController) {
     composable<CreateEstimate> {
-        CreateEstimateScreen()
+        CreateEstimateScreen(
+            onBack = { navController.popBackStack() }
+        )
     }
 }
 

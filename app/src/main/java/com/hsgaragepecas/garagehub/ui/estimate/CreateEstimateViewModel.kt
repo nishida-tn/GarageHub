@@ -87,9 +87,13 @@ class CreateEstimateViewModel @Inject constructor(
             is CreateEstimateUiIntent.OnItemGenuineCodeChange -> _uiState.update { it.copy(itemGenuineCode = intent.value) }
             is CreateEstimateUiIntent.OnItemPartNameChange -> _uiState.update { it.copy(itemPartName = intent.value) }
             is CreateEstimateUiIntent.OnItemTHChange -> _uiState.update { it.copy(itemTH = intent.value) }
+            is CreateEstimateUiIntent.OnItemTHValueChange -> _uiState.update { it.copy(itemTHValue = intent.value) }
             is CreateEstimateUiIntent.OnItemRiHChange -> _uiState.update { it.copy(itemRiH = intent.value) }
+            is CreateEstimateUiIntent.OnItemRiHValueChange -> _uiState.update { it.copy(itemRiHValue = intent.value) }
             is CreateEstimateUiIntent.OnItemRHChange -> _uiState.update { it.copy(itemRH = intent.value) }
+            is CreateEstimateUiIntent.OnItemRHValueChange -> _uiState.update { it.copy(itemRHValue = intent.value) }
             is CreateEstimateUiIntent.OnItemPHChange -> _uiState.update { it.copy(itemPH = intent.value) }
+            is CreateEstimateUiIntent.OnItemPHValueChange -> _uiState.update { it.copy(itemPHValue = intent.value) }
             is CreateEstimateUiIntent.OnItemPartPriceChange -> _uiState.update { it.copy(itemPartPrice = intent.value) }
             CreateEstimateUiIntent.AddItem -> addItem()
             CreateEstimateUiIntent.SaveEstimate -> saveEstimate()
@@ -132,15 +136,23 @@ class CreateEstimateViewModel @Inject constructor(
 
     private fun addItem() {
         val state = _uiState.value
+        val moHourValue = state.moHourValue.replace(",", ".").toDoubleOrNull() ?: 0.0
+        val paintingHourValue = state.paintingHourValue.replace(",", ".").toDoubleOrNull() ?: 0.0
+
+        val itemTHValue = state.itemTHValue.replace(",", ".").toDoubleOrNull() ?: 0.0
+        val itemRiHValue = state.itemRiHValue.replace(",", ".").toDoubleOrNull() ?: 0.0
+        val itemRHValue = state.itemRHValue.replace(",", ".").toDoubleOrNull() ?: 0.0
+        val itemPHValue = state.itemPHValue.replace(",", ".").toDoubleOrNull() ?: 0.0
+
         val newItem = EstimateItemDto(
             partName = state.itemPartName,
             genuineCode = state.itemGenuineCode,
             unitPrice = state.itemPartPrice.replace(",", ".").toDoubleOrNull() ?: 0.0,
             quantity = 1,
-            valueT = if (state.itemTH) 100.0 else 0.0,
-            valueRi = if (state.itemRiH) 50.0 else 0.0,
-            valueR = if (state.itemRH) 80.0 else 0.0,
-            valueP = if (state.itemPH) 120.0 else 0.0
+            valueT = if (state.itemTH) itemTHValue * moHourValue else 0.0,
+            valueRi = if (state.itemRiH) itemRiHValue * moHourValue else 0.0,
+            valueR = if (state.itemRH) itemRHValue * moHourValue else 0.0,
+            valueP = if (state.itemPH) itemPHValue * paintingHourValue else 0.0
         )
         val total = (newItem.unitPrice ?: 0.0) + (newItem.valueT ?: 0.0) + (newItem.valueRi ?: 0.0) + (newItem.valueR ?: 0.0) + (newItem.valueP ?: 0.0)
         val newItemWithTotal = newItem.copy(totalValue = total)
@@ -151,9 +163,13 @@ class CreateEstimateViewModel @Inject constructor(
                 itemPartName = "",
                 itemGenuineCode = "",
                 itemTH = false,
+                itemTHValue = "",
                 itemRiH = false,
+                itemRiHValue = "",
                 itemRH = false,
+                itemRHValue = "",
                 itemPH = false,
+                itemPHValue = "",
                 itemPartPrice = "0,00"
             )
         }
