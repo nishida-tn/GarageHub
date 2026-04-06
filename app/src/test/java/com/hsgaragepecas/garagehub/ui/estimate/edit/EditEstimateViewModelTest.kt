@@ -6,6 +6,7 @@ import com.hsgaragepecas.garagehub.data.model.EstimateItemDto
 import com.hsgaragepecas.garagehub.domain.usecases.CheckItemDeletionUseCase
 import com.hsgaragepecas.garagehub.domain.usecases.CreateDemandUseCase
 import com.hsgaragepecas.garagehub.domain.usecases.DeleteEstimateUseCase
+import com.hsgaragepecas.garagehub.domain.usecases.GenerateEstimatePdfUseCase
 import com.hsgaragepecas.garagehub.domain.usecases.GenerateOrdersUseCase
 import com.hsgaragepecas.garagehub.domain.usecases.GetEstimateDetailUseCase
 import com.hsgaragepecas.garagehub.domain.usecases.GetTimeSuggestionUseCase
@@ -40,6 +41,7 @@ class EditEstimateViewModelTest {
     private val generateOrdersUseCase: GenerateOrdersUseCase = mockk()
     private val checkItemDeletionUseCase: CheckItemDeletionUseCase = mockk()
     private val createDemandUseCase: CreateDemandUseCase = mockk()
+    private val generateEstimatePdfUseCase: GenerateEstimatePdfUseCase = mockk()
 
     private lateinit var viewModel: EditEstimateViewModel
 
@@ -53,7 +55,8 @@ class EditEstimateViewModelTest {
             getTimeSuggestionUseCase,
             generateOrdersUseCase,
             checkItemDeletionUseCase,
-            createDemandUseCase
+            createDemandUseCase,
+            generateEstimatePdfUseCase
         )
     }
 
