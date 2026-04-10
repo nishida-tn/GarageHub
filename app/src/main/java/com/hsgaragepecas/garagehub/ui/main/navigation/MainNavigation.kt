@@ -33,3 +33,14 @@ fun NavController.navigateToMainScreenFromCreateAccount() {
         }
     }
 }
+
+/**
+ * Navigates to the main screen, popping the login screen from the back stack.
+ */
+fun NavController.navigateToMainScreenFromLogin() {
+    navigate(Main) {
+        popUpTo(Login) {
+            inclusive = true
+        }
+    }
+}
