@@ -1,5 +1,6 @@
 package com.hsgaragepecas.garagehub.data.remote
 
+import com.hsgaragepecas.garagehub.data.model.CommonResponse
 import com.hsgaragepecas.garagehub.data.model.ForgotPasswordRequest
 import com.hsgaragepecas.garagehub.data.model.LoginRequest
 import com.hsgaragepecas.garagehub.data.model.LoginResponse
@@ -31,7 +32,7 @@ interface AuthService {
      * @return A map indicating success.
      */
     @POST("auth/signup")
-    suspend fun signup(@Body request: SignupRequest): Map<String, Boolean>
+    suspend fun signup(@Body request: SignupRequest): CommonResponse
 
     /**
      * Requests a password reset email.
@@ -40,7 +41,7 @@ interface AuthService {
      * @return A map indicating success.
      */
     @POST("auth/forgot-password")
-    suspend fun forgotPassword(@Body request: ForgotPasswordRequest): Map<String, Any>
+    suspend fun forgotPassword(@Body request: ForgotPasswordRequest): CommonResponse
 
     /**
      * Resets the user's password using a token.
@@ -49,7 +50,7 @@ interface AuthService {
      * @return A map indicating success.
      */
     @POST("auth/reset-password")
-    suspend fun resetPassword(@Body request: ResetPasswordRequest): Map<String, Any>
+    suspend fun resetPassword(@Body request: ResetPasswordRequest): CommonResponse
 
     /**
      * Gets the current user's data.

@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.hsgaragepecas.garagehub.ui.account.create.navigation.createAccountScreen
+import com.hsgaragepecas.garagehub.ui.account.forgot.navigation.forgotPasswordScreen
 import com.hsgaragepecas.garagehub.ui.account.login.navigation.loginScreen
 import com.hsgaragepecas.garagehub.ui.main.navigation.mainScreen
 import com.hsgaragepecas.garagehub.ui.splash.navigation.splashScreen
@@ -28,6 +29,7 @@ fun AppNavHost(
         splashScreen(navController)
         loginScreen(navController)
         createAccountScreen(navController)
+        forgotPasswordScreen(navController)
         mainScreen()
     }
 }

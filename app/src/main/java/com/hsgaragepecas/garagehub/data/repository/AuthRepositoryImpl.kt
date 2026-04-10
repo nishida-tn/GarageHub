@@ -58,7 +58,7 @@ class AuthRepositoryImpl @Inject constructor(
                 portal = "hs"
             )
             val signupResponse = authService.signup(signupRequest)
-            if (signupResponse["ok"] == true) {
+            if (signupResponse.ok) {
                 // Auto-login after successful signup
                 login(email, password)
             } else {
@@ -72,7 +72,7 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun forgotPassword(email: String): Result<Unit> {
         return try {
             val response = authService.forgotPassword(ForgotPasswordRequest(email))
-            if (response["ok"] == true) {
+            if (response.ok) {
                 Result.Success(Unit)
             } else {
                 Result.Error(Exception("Forgot password request failed"))
@@ -85,7 +85,7 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun resetPassword(token: String, newPassword: String): Result<Unit> {
         return try {
             val response = authService.resetPassword(ResetPasswordRequest(token, newPassword))
-            if (response["ok"] == true) {
+            if (response.ok) {
                 Result.Success(Unit)
             } else {
                 Result.Error(Exception("Reset password failed"))

@@ -19,13 +19,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -33,6 +32,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hsgaragepecas.garagehub.R
 import com.hsgaragepecas.garagehub.ui.theme.GarageCardBackground
 import com.hsgaragepecas.garagehub.ui.theme.GarageDarkBackground
@@ -40,24 +40,58 @@ import com.hsgaragepecas.garagehub.ui.theme.GarageDivider
 import com.hsgaragepecas.garagehub.ui.theme.GarageGreyText
 import com.hsgaragepecas.garagehub.ui.theme.GarageHubTheme
 import com.hsgaragepecas.garagehub.ui.theme.GarageYellow
+import kotlinx.coroutines.flow.collectLatest
 
 /**
  * A screen that allows the user to reset their password.
  *
- * @param modifier The modifier to be applied to the screen.
- * @param onSendLinkClick A lambda to be called when the send link button is clicked.
+ * @param viewModel The view model for the screen.
  * @param onBackToLoginClick A lambda to be called when the back to login button is clicked.
  */
 @Composable
 fun ForgotPasswordScreen(
-    modifier: Modifier = Modifier,
-    onSendLinkClick: (String) -> Unit = {},
+    viewModel: ForgotPasswordViewModel,
     onBackToLoginClick: () -> Unit = {}
 ) {
-    var email by remember { mutableStateOf("") }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
+    LaunchedEffect(Unit) {
+        viewModel.effect.collectLatest { effect ->
+            when (effect) {
+                is ForgotPasswordContract.Effect.NavigateBackToLogin -> {
+                    onBackToLoginClick()
+                }
+                is ForgotPasswordContract.Effect.ShowSuccessMessage -> {
+                    // Show a success message (e.g., Toast or Snackbar)
+                    // For simplicity, we can also navigate back or show a success state in UI
+                }
+            }
+        }
+    }
+
+    ForgotPasswordContent(
+        uiState = uiState,
+        onIntent = viewModel::onIntent,
+        onBackToLoginClick = onBackToLoginClick
+    )
+}
+
+/**
+ * The content of the forgot password screen.
+ *
+ * @param uiState The current UI state.
+ * @param onIntent A lambda to be called when an intent is triggered.
+ * @param onBackToLoginClick A lambda to be called when the back to login button is clicked.
+ */
+@Composable
+private fun ForgotPasswordContent(
+    uiState: ForgotPasswordContract.State,
+    onIntent: (ForgotPasswordContract.Intent) -> Unit,
+    onBackToLoginClick: () -> Unit
+) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(GarageDarkBackground),
         contentAlignment = Alignment.Center
@@ -106,8 +140,8 @@ fun ForgotPasswordScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
-                        value = email,
-                        onValueChange = { email = it },
+                        value = uiState.email,
+                        onValueChange = { onIntent(ForgotPasswordContract.Intent.EmailChanged(it)) },
                         modifier = Modifier.fillMaxWidth(),
                         placeholder = {
                             Text(
@@ -125,14 +159,33 @@ fun ForgotPasswordScreen(
                             focusedBorderColor = GarageDivider,
                             unfocusedBorderColor = GarageDivider
                         ),
-                        singleLine = true
+                        singleLine = true,
+                        enabled = !uiState.isLoading
+                    )
+                }
+
+                if (uiState.error != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = uiState.error,
+                        color = Color.Red,
+                        fontSize = 14.sp
+                    )
+                }
+
+                if (uiState.isSuccess) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Link de recuperação enviado com sucesso!",
+                        color = GarageYellow,
+                        fontSize = 14.sp
                     )
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
-                    onClick = { onSendLinkClick(email) },
+                    onClick = { onIntent(ForgotPasswordContract.Intent.SendLinkClicked) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
@@ -140,10 +193,11 @@ fun ForgotPasswordScreen(
                         containerColor = GarageYellow,
                         contentColor = Color.Black
                     ),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
+                    enabled = !uiState.isLoading && !uiState.isSuccess
                 ) {
                     Text(
-                        text = stringResource(R.string.forgot_password_send_button),
+                        text = if (uiState.isLoading) "Enviando..." else stringResource(R.string.forgot_password_send_button),
                         style = TextStyle(
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp
@@ -182,6 +236,10 @@ fun ForgotPasswordScreen(
 @Composable
 private fun ForgotPasswordScreenPreview() {
     GarageHubTheme(darkTheme = true) {
-        ForgotPasswordScreen()
+        ForgotPasswordContent(
+            uiState = ForgotPasswordContract.State(),
+            onIntent = {},
+            onBackToLoginClick = {}
+        )
     }
 }
