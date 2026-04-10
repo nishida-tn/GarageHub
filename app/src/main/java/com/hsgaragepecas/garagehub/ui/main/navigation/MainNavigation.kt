@@ -24,11 +24,11 @@ fun NavController.navigateToMainScreen() {
 }
 
 /**
- * Navigates to the main screen, popping the login screen from the back stack.
+ * Navigates to the main screen, popping the create account screen from the back stack.
  */
-fun NavController.navigateToMainScreenFromLogin() {
+fun NavController.navigateToMainScreenFromCreateAccount() {
     navigate(Main) {
-        popUpTo(Login) {
+        popUpTo(com.hsgaragepecas.garagehub.navigation.CreateAccount) {
             inclusive = true
         }
     }

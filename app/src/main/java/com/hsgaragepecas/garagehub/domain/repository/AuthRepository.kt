@@ -18,15 +18,15 @@ interface AuthRepository {
     suspend fun login(email: String, password: String): Result<LoginResponse>
 
     /**
-     * Signs up a new user.
+     * Signs up a new user and automatically logs them in.
      *
      * @param email The user's email.
      * @param password The user's password.
      * @param name The user's name.
      * @param whatsapp The user's WhatsApp number.
-     * @return A result indicating whether the signup was successful.
+     * @return A result containing the login response.
      */
-    suspend fun signup(email: String, password: String, name: String?, whatsapp: String): Result<Unit>
+    suspend fun signup(email: String, password: String, name: String?, whatsapp: String): Result<LoginResponse>
 
     /**
      * Requests a password reset email.

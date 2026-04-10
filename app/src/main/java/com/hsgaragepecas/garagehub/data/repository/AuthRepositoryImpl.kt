@@ -47,18 +47,20 @@ class AuthRepositoryImpl @Inject constructor(
         password: String,
         name: String?,
         whatsapp: String
-    ): Result<Unit> {
+    ): Result<LoginResponse> {
         return try {
-            val request = SignupRequest(
+            val cleanWhatsapp = whatsapp.filter { it.isDigit() }
+            val signupRequest = SignupRequest(
                 email = email,
                 password = password,
                 name = name,
-                whatsapp = whatsapp,
+                whatsapp = cleanWhatsapp,
                 portal = "hs"
             )
-            val response = authService.signup(request)
-            if (response["ok"] == true) {
-                Result.Success(Unit)
+            val signupResponse = authService.signup(signupRequest)
+            if (signupResponse["ok"] == true) {
+                // Auto-login after successful signup
+                login(email, password)
             } else {
                 Result.Error(Exception("Signup failed"))
             }

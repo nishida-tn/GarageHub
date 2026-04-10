@@ -1,5 +1,6 @@
 package com.hsgaragepecas.garagehub.domain.usecases
 
+import com.hsgaragepecas.garagehub.data.model.LoginResponse
 import com.hsgaragepecas.garagehub.domain.Result
 import com.hsgaragepecas.garagehub.domain.repository.AuthRepository
 import javax.inject.Inject
@@ -19,14 +20,14 @@ class SignupUseCase @Inject constructor(
      * @param password The user's password.
      * @param name The user's name.
      * @param whatsapp The user's WhatsApp number.
-     * @return A result indicating whether the signup was successful.
+     * @return A result containing the login response if successful.
      */
     suspend operator fun invoke(
         email: String,
         password: String,
         name: String?,
         whatsapp: String
-    ): Result<Unit> {
+    ): Result<LoginResponse> {
         return authRepository.signup(email, password, name, whatsapp)
     }
 }

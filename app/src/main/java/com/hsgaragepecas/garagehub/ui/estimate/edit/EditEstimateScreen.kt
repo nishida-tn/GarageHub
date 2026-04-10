@@ -3,9 +3,11 @@ package com.hsgaragepecas.garagehub.ui.estimate.edit
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,8 +16,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -31,10 +36,14 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -45,6 +54,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,16 +64,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.hsgaragepecas.garagehub.data.model.EstimateFullDto
 import com.hsgaragepecas.garagehub.data.model.EstimateItemDto
 import com.hsgaragepecas.garagehub.ui.estimate.edit.EditEstimateContract.EditEstimateUiEvent
 import com.hsgaragepecas.garagehub.ui.estimate.edit.EditEstimateContract.EditEstimateUiIntent
 import com.hsgaragepecas.garagehub.ui.estimate.edit.EditEstimateContract.EditEstimateUiState
+import com.hsgaragepecas.garagehub.ui.theme.GarageDivider
+import com.hsgaragepecas.garagehub.ui.theme.GarageGreyText
 import com.hsgaragepecas.garagehub.ui.theme.GarageHubTheme
 import com.hsgaragepecas.garagehub.ui.theme.GarageYellow
 
@@ -141,64 +155,99 @@ private fun EditEstimateContent(
                 ) {
                     EditInputField(
                         label = "Valor hora M.O.",
-                        value = uiState.estimate?.moHourValue?.toString() ?: "",
-                        onValueChange = {},
-                        modifier = Modifier.weight(1f)
+                        value = uiState.moHourValue,
+                        onValueChange = { onIntent(EditEstimateUiIntent.OnMoHourValueChange(it)) },
+                        modifier = Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
                     EditInputField(
                         label = "Valor hora Pintura",
-                        value = uiState.estimate?.paintingHourValue?.toString() ?: "",
-                        onValueChange = {},
-                        modifier = Modifier.weight(1f)
+                        value = uiState.paintingHourValue,
+                        onValueChange = { onIntent(EditEstimateUiIntent.OnPaintingHourValueChange(it)) },
+                        modifier = Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
                 }
 
                 SectionHeader(title = "Dados de cliente")
-                EditInputField(label = "Nome", value = uiState.estimate?.clientName ?: "", onValueChange = {})
-                EditInputField(label = "Tel.", value = uiState.estimate?.clientTel ?: "", onValueChange = {})
-                EditInputField(label = "Whats", value = uiState.estimate?.clientWhats ?: "", onValueChange = {})
-                EditInputField(label = "CEP", value = uiState.estimate?.clientCep ?: "", onValueChange = {})
-                EditInputField(label = "Endereço", value = uiState.estimate?.clientAddress ?: "", onValueChange = {})
+                EditInputField(label = "Nome", value = uiState.clientName, onValueChange = { onIntent(EditEstimateUiIntent.OnClientNameChange(it)) })
+                EditInputField(label = "Tel.", value = uiState.clientTel, onValueChange = { onIntent(EditEstimateUiIntent.OnClientTelChange(it)) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone))
+                EditInputField(label = "Whats", value = uiState.clientWhats, onValueChange = { onIntent(EditEstimateUiIntent.OnClientWhatsChange(it)) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone))
+                EditInputField(label = "CEP", value = uiState.clientCep, onValueChange = { onIntent(EditEstimateUiIntent.OnClientCepChange(it)) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+                EditInputField(label = "Endereço", value = uiState.clientAddress, onValueChange = { onIntent(EditEstimateUiIntent.OnClientAddressChange(it)) })
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    EditInputField(label = "N°", value = uiState.estimate?.clientNumber ?: "", onValueChange = {}, modifier = Modifier.weight(1f))
-                    EditInputField(label = "Bairro", value = uiState.estimate?.clientNeighborhood ?: "", onValueChange = {}, modifier = Modifier.weight(2f))
+                    EditInputField(label = "N°", value = uiState.clientNumber, onValueChange = { onIntent(EditEstimateUiIntent.OnClientNumberChange(it)) }, modifier = Modifier.weight(1f), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+                    EditInputField(label = "Bairro", value = uiState.clientNeighborhood, onValueChange = { onIntent(EditEstimateUiIntent.OnClientNeighborhoodChange(it)) }, modifier = Modifier.weight(2f))
                 }
-                EditInputField(label = "Cidade", value = uiState.estimate?.clientCity ?: "", onValueChange = {})
-                EditInputField(label = "UF", value = uiState.estimate?.clientUf ?: "", onValueChange = {})
-                EditInputField(label = "Complemento", value = uiState.estimate?.clientComplement ?: "", onValueChange = {})
+                EditInputField(label = "Cidade", value = uiState.clientCity, onValueChange = { onIntent(EditEstimateUiIntent.OnClientCityChange(it)) })
+                EditInputField(label = "UF", value = uiState.clientUf, onValueChange = { onIntent(EditEstimateUiIntent.OnClientUfChange(it)) })
+                EditInputField(label = "Complemento", value = uiState.clientComplement, onValueChange = { onIntent(EditEstimateUiIntent.OnClientComplementChange(it)) })
 
                 SectionHeader(title = "Dados de veículo")
-                EditInputField(label = "Placa", value = uiState.estimate?.vehiclePlate ?: "", onValueChange = {})
-                DropdownField(label = "Marca", selectedOption = uiState.estimate?.vehicleBrand ?: "Selecione")
-                DropdownField(label = "Modelo", selectedOption = uiState.estimate?.vehicleModel ?: "Selecione")
+                EditInputField(label = "Placa", value = uiState.vehiclePlate, onValueChange = { onIntent(EditEstimateUiIntent.OnVehiclePlateChange(it)) })
+                
+                EditDropdownField(
+                    label = "Marca",
+                    options = uiState.brands,
+                    selectedOption = uiState.vehicleBrand,
+                    onOptionSelected = { onIntent(EditEstimateUiIntent.OnBrandSelected(it)) },
+                    optionLabel = { it.name }
+                )
+                
+                EditDropdownField(
+                    label = "Modelo",
+                    options = uiState.models,
+                    selectedOption = uiState.vehicleModel,
+                    onOptionSelected = { onIntent(EditEstimateUiIntent.OnModelSelected(it)) },
+                    optionLabel = { it.name }
+                )
+
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    EditInputField(label = "Ano fabric.", value = uiState.estimate?.vehicleYearFab?.toString() ?: "", onValueChange = {}, modifier = Modifier.weight(1f))
-                    EditInputField(label = "Ano modelo", value = uiState.estimate?.vehicleYearMod?.toString() ?: "", onValueChange = {}, modifier = Modifier.weight(1f))
+                    EditDropdownField(
+                        label = "Ano fabric.",
+                        options = uiState.years,
+                        selectedOption = uiState.selectedYear?.name ?: uiState.vehicleYearFab,
+                        onOptionSelected = { onIntent(EditEstimateUiIntent.OnYearSelected(it)) },
+                        optionLabel = { it.name },
+                        modifier = Modifier.weight(1f)
+                    )
+                    EditInputField(
+                        label = "Ano modelo",
+                        value = uiState.vehicleYearMod,
+                        onValueChange = { onIntent(EditEstimateUiIntent.OnVehicleYearModChange(it)) },
+                        modifier = Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
                 }
-                EditInputField(label = "Chassi (opcional)", value = uiState.estimate?.vehicleChassis ?: "", onValueChange = {})
-                DropdownField(label = "Combustível (opcional)", selectedOption = uiState.estimate?.vehicleFuel ?: "Selecione")
-                DropdownField(label = "Ar condicionado (opcional)", selectedOption = uiState.estimate?.vehicleAir ?: "Selecione")
-                DropdownField(label = "Direção (opcional)", selectedOption = uiState.estimate?.vehicleSteering ?: "Selecione")
-                DropdownField(label = "Câmbio (opcional)", selectedOption = uiState.estimate?.vehicleTransmission ?: "Selecione")
+                EditInputField(label = "Chassi (opcional)", value = uiState.vehicleChassis, onValueChange = { onIntent(EditEstimateUiIntent.OnVehicleChassisChange(it)) })
+                EditInputField(label = "Combustível (opcional)", value = uiState.vehicleFuel, onValueChange = { onIntent(EditEstimateUiIntent.OnVehicleFuelChange(it)) })
+                EditInputField(label = "Ar condicionado (opcional)", value = uiState.vehicleAir, onValueChange = { onIntent(EditEstimateUiIntent.OnVehicleAirChange(it)) })
+                EditInputField(label = "Direção (opcional)", value = uiState.vehicleSteering, onValueChange = { onIntent(EditEstimateUiIntent.OnVehicleSteeringChange(it)) })
+                EditInputField(label = "Câmbio (opcional)", value = uiState.vehicleTransmission, onValueChange = { onIntent(EditEstimateUiIntent.OnVehicleTransmissionChange(it)) })
 
                 SectionHeader(title = "Fotos do veículo (máx. 10)")
                 PhotoPicker()
-                Row(modifier = Modifier.padding(vertical = 8.dp)) {
-                    uiState.photos.forEach { photoUrl ->
-                        AsyncImage(
-                            model = photoUrl,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(80.dp)
-                                .padding(end = 8.dp)
-                                .clip(RoundedCornerShape(8.dp)),
-                            contentScale = ContentScale.Crop
-                        )
+                if (uiState.photos.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items(uiState.photos) { photoUrl ->
+                            AsyncImage(
+                                model = photoUrl,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(80.dp)
+                                    .clip(RoundedCornerShape(8.dp)),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
                     }
                 }
 
                 SectionHeader(title = "Itens / serviços")
-                ItemInputSection()
+                ItemInputSection(uiState, onIntent)
 
                 Spacer(modifier = Modifier.height(16.dp))
                 
@@ -211,7 +260,7 @@ private fun EditEstimateContent(
 
                 Spacer(modifier = Modifier.height(24.dp))
                 
-                ActionButtons(onIntent)
+                ActionButtons(uiState, onIntent)
                 
                 Spacer(modifier = Modifier.height(32.dp))
             }
@@ -235,7 +284,9 @@ private fun EditInputField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: String? = null
+    placeholder: String? = null,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    readOnly: Boolean = false
 ) {
     Column(modifier = modifier.fillMaxWidth().padding(vertical = 4.dp)) {
         Text(text = label, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
@@ -249,28 +300,61 @@ private fun EditInputField(
                 focusedBorderColor = GarageYellow,
                 unfocusedBorderColor = Color.DarkGray
             ),
-            singleLine = true
+            singleLine = true,
+            keyboardOptions = keyboardOptions,
+            readOnly = readOnly
         )
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DropdownField(label: String, selectedOption: String) {
-    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+private fun <T> EditDropdownField(
+    label: String,
+    options: List<T>,
+    selectedOption: String,
+    onOptionSelected: (T) -> Unit,
+    optionLabel: (T) -> String,
+    modifier: Modifier = Modifier,
+    placeholder: String = "Selecione"
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column(modifier = modifier.fillMaxWidth().padding(vertical = 4.dp)) {
         Text(text = label, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
-        Surface(
-            modifier = Modifier.fillMaxWidth().height(56.dp),
-            shape = RoundedCornerShape(8.dp),
-            border = BorderStroke(1.dp, Color.DarkGray),
-            color = Color.Transparent
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded },
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+            OutlinedTextField(
+                value = selectedOption,
+                onValueChange = {},
+                readOnly = true,
+                placeholder = { Text(text = placeholder, color = GarageGreyText) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                shape = RoundedCornerShape(8.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = GarageYellow,
+                    unfocusedBorderColor = Color.DarkGray
+                )
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
             ) {
-                Text(text = selectedOption, color = Color.White)
-                Text(text = "▼", fontSize = 10.sp, color = Color.Gray)
+                options.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(text = optionLabel(option)) },
+                        onClick = {
+                            onOptionSelected(option)
+                            expanded = false
+                        }
+                    )
+                }
             }
         }
     }
@@ -309,25 +393,25 @@ private fun PhotoPicker() {
 }
 
 @Composable
-private fun ItemInputSection() {
+private fun ItemInputSection(uiState: EditEstimateUiState, onIntent: (EditEstimateUiIntent) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        EditInputField(label = "Cód. genuíno", value = "", onValueChange = {})
-        EditInputField(label = "Peça", value = "", onValueChange = {}, placeholder = "Ex: Paralama esquerdo")
+        EditInputField(label = "Cód. genuíno", value = uiState.itemGenuineCode, onValueChange = { onIntent(EditEstimateUiIntent.OnItemGenuineCodeChange(it)) })
+        EditInputField(label = "Peça", value = uiState.itemPartName, onValueChange = { onIntent(EditEstimateUiIntent.OnItemPartNameChange(it)) }, placeholder = "Ex: Paralama esquerdo")
         
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            ItemCheckbox(label = "T (h)")
-            ItemCheckbox(label = "R&I (h)")
+            ItemCheckbox(label = "T (h)", checked = uiState.itemTH, onCheckedChange = { onIntent(EditEstimateUiIntent.OnItemTHChange(it)) }, value = uiState.itemTHValue, onValueChange = { onIntent(EditEstimateUiIntent.OnItemTHValueChange(it)) })
+            ItemCheckbox(label = "R&I (h)", checked = uiState.itemRiH, onCheckedChange = { onIntent(EditEstimateUiIntent.OnItemRiHChange(it)) }, value = uiState.itemRiHValue, onValueChange = { onIntent(EditEstimateUiIntent.OnItemRiHValueChange(it)) })
         }
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            ItemCheckbox(label = "R (h)")
-            ItemCheckbox(label = "P (h)")
+            ItemCheckbox(label = "R (h)", checked = uiState.itemRH, onCheckedChange = { onIntent(EditEstimateUiIntent.OnItemRHChange(it)) }, value = uiState.itemRHValue, onValueChange = { onIntent(EditEstimateUiIntent.OnItemRHValueChange(it)) })
+            ItemCheckbox(label = "P (h)", checked = uiState.itemPH, onCheckedChange = { onIntent(EditEstimateUiIntent.OnItemPHChange(it)) }, value = uiState.itemPHValue, onValueChange = { onIntent(EditEstimateUiIntent.OnItemPHValueChange(it)) })
         }
         
-        EditInputField(label = "Preço peça", value = "0,00", onValueChange = {})
-        EditInputField(label = "Total", value = "", onValueChange = {})
+        EditInputField(label = "Preço peça", value = uiState.itemPartPrice, onValueChange = { onIntent(EditEstimateUiIntent.OnItemPartPriceChange(it)) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+        EditInputField(label = "Total", value = uiState.itemTotal, onValueChange = {}, readOnly = true)
         
         Button(
-            onClick = {},
+            onClick = { onIntent(EditEstimateUiIntent.AddItem) },
             modifier = Modifier.align(Alignment.End),
             colors = ButtonDefaults.buttonColors(containerColor = GarageYellow),
             shape = RoundedCornerShape(8.dp)
@@ -338,14 +422,34 @@ private fun ItemInputSection() {
 }
 
 @Composable
-private fun ItemCheckbox(label: String) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Checkbox(
-            checked = false,
-            onCheckedChange = {},
-            colors = CheckboxDefaults.colors(checkedColor = GarageYellow)
+private fun ItemCheckbox(
+    label: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    value: String,
+    onValueChange: (String) -> Unit
+) {
+    Column(modifier = Modifier.width(150.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(
+                checked = checked,
+                onCheckedChange = onCheckedChange,
+                colors = CheckboxDefaults.colors(checkedColor = GarageYellow)
+            )
+            Text(text = label, style = MaterialTheme.typography.bodyMedium)
+        }
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier.fillMaxWidth().padding(start = 12.dp),
+            shape = RoundedCornerShape(8.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = GarageYellow,
+                unfocusedBorderColor = Color.DarkGray
+            ),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
-        Text(text = label, style = MaterialTheme.typography.bodyMedium)
     }
 }
 
@@ -358,19 +462,14 @@ private fun ItemRow(item: EstimateItemDto, onIntent: (EditEstimateUiIntent) -> U
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(color = GarageYellow, shape = RoundedCornerShape(4.dp)) {
-                    Text(
-                        text = "T", // This should be dynamic based on selection
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 10.sp,
-                        modifier = Modifier.padding(horizontal = 4.dp)
-                    )
-                }
+                if (item.selT == 1) LaborBadge("T")
+                if (item.selRi == 1) LaborBadge("R&I")
+                if (item.selR == 1) LaborBadge("R")
+                if (item.selP == 1) LaborBadge("P")
+                
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(text = item.partName ?: "", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
             }
-            Text(text = "D-EPD", color = Color.Green, fontSize = 10.sp) // Dummy status
             
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Column {
@@ -378,128 +477,119 @@ private fun ItemRow(item: EstimateItemDto, onIntent: (EditEstimateUiIntent) -> U
                     Text(text = "R$ Peça: ${item.unitPrice ?: 0.0}", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    Text(text = "R$ Serv: ${item.valueT ?: 0.0}", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                    val laborTotal = (item.valueT ?: 0.0) + (item.valueRi ?: 0.0) + (item.valueR ?: 0.0) + (item.valueP ?: 0.0)
+                    Text(text = "R$ Serv: $laborTotal", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
                     Row {
-                        IconButton(onClick = {}, modifier = Modifier.size(24.dp)) {
+                        IconButton(onClick = { /* Share item logic */ }, modifier = Modifier.size(24.dp)) {
                             Icon(Icons.Default.Share, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(16.dp))
                         }
-                        IconButton(onClick = {}, modifier = Modifier.size(24.dp)) {
+                        IconButton(onClick = { item.id?.let { onIntent(EditEstimateUiIntent.DeleteItem(it)) } }, modifier = Modifier.size(24.dp)) {
                             Icon(Icons.Default.Delete, contentDescription = null, tint = Color.Red, modifier = Modifier.size(16.dp))
                         }
                     }
                 }
             }
-            Text(
-                text = "Total R$ ${item.totalValue ?: 0.0}",
-                color = GarageYellow,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
         }
+    }
+}
+
+@Composable
+private fun LaborBadge(text: String) {
+    Surface(
+        color = GarageYellow, 
+        shape = RoundedCornerShape(4.dp),
+        modifier = Modifier.padding(end = 4.dp)
+    ) {
+        Text(
+            text = text,
+            color = Color.Black,
+            fontWeight = FontWeight.Bold,
+            fontSize = 10.sp,
+            modifier = Modifier.padding(horizontal = 4.dp)
+        )
     }
 }
 
 @Composable
 private fun SummarySection(items: List<EstimateItemDto>) {
-    val totalParts = items.sumOf { (it.unitPrice ?: 0.0) * it.quantity }
-    val totalService = items.sumOf { (it.valueT ?: 0.0) + (it.valueRi ?: 0.0) + (it.valueR ?: 0.0) + (it.valueP ?: 0.0) }
-    val total = totalParts + totalService
+    val totalParts = items.sumOf { it.unitPrice ?: 0.0 }
+    val totalLabor = items.sumOf { (it.valueT ?: 0.0) + (it.valueRi ?: 0.0) + (it.valueR ?: 0.0) + (it.valueP ?: 0.0) }
+    val total = totalParts + totalLabor
 
     Card(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Black),
-        border = BorderStroke(1.dp, GarageYellow)
+        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.DarkGray.copy(alpha = 0.1f))
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            SummaryItem(label = "TOTAL PEÇAS", value = "R$ ${"%,.2f".format(totalParts)}")
-            SummaryItem(label = "TOTAL SERV.", value = "R$ ${"%,.2f".format(totalService)}", valueColor = GarageYellow)
-            SummaryItem(label = "TOTAL ORÇAMENTO", value = "R$ ${"%,.2f".format(total)}", valueColor = GarageYellow)
+        Column(modifier = Modifier.padding(16.dp)) {
+            SummaryRow(label = "Total Peças", value = "R$ $totalParts")
+            SummaryRow(label = "Total M.O.", value = "R$ $totalLabor")
+            Spacer(modifier = Modifier.height(8.dp))
+            SummaryRow(label = "Total Geral", value = "R$ $total", isTotal = true)
         }
     }
 }
 
 @Composable
-private fun SummaryItem(label: String, value: String, valueColor: Color = Color.White) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = label, fontSize = 10.sp, color = Color.Gray)
-        Text(text = value, fontWeight = FontWeight.Bold, color = valueColor, fontSize = 14.sp)
+private fun SummaryRow(label: String, value: String, isTotal: Boolean = false) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(text = label, fontWeight = if (isTotal) FontWeight.Bold else FontWeight.Normal, fontSize = if (isTotal) 18.sp else 14.sp)
+        Text(text = value, fontWeight = if (isTotal) FontWeight.Bold else FontWeight.Normal, fontSize = if (isTotal) 18.sp else 14.sp, color = if (isTotal) GarageYellow else Color.White)
     }
 }
 
 @Composable
-private fun ActionButtons(onIntent: (EditEstimateUiIntent) -> Unit) {
+private fun ActionButtons(uiState: EditEstimateUiState, onIntent: (EditEstimateUiIntent) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Button(
             onClick = { onIntent(EditEstimateUiIntent.SaveEstimate) },
-            modifier = Modifier.fillMaxWidth().height(48.dp),
+            modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = GarageYellow),
-            shape = RoundedCornerShape(8.dp)
+            shape = RoundedCornerShape(8.dp),
+            enabled = !uiState.isSaving
         ) {
-            Text("Salvar orçamento", color = Color.Black, fontWeight = FontWeight.Bold)
+            if (uiState.isSaving) CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.Black)
+            else Text("Salvar Orçamento", color = Color.Black, fontWeight = FontWeight.Bold)
         }
         
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(
-                onClick = { onIntent(EditEstimateUiIntent.MakeOrder) },
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(containerColor = GarageYellow),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text("Fazer Pedido", color = Color.Black, fontSize = 12.sp)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            ActionButton(text = "PDF", icon = Icons.Default.Description, modifier = Modifier.weight(1f)) {
+                onIntent(EditEstimateUiIntent.GeneratePdf)
             }
-            Button(
-                onClick = { onIntent(EditEstimateUiIntent.GeneratePdf) },
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Icon(Icons.Default.Description, contentDescription = null, modifier = Modifier.size(16.dp))
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("PDF", fontSize = 12.sp)
+            ActionButton(text = "Whats", icon = Icons.Default.Send, modifier = Modifier.weight(1f)) {
+                onIntent(EditEstimateUiIntent.SendWhatsApp)
             }
-            Button(
-                onClick = { onIntent(EditEstimateUiIntent.SendWhatsApp) },
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Icon(Icons.Default.Send, contentDescription = null, modifier = Modifier.size(16.dp))
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("Whats", fontSize = 12.sp)
+            ActionButton(text = "Demanda", icon = Icons.Default.Share, modifier = Modifier.weight(1f), containerColor = Color(0xFF0D6EFD)) {
+                onIntent(EditEstimateUiIntent.CreateDemand)
             }
         }
         
         Button(
-            onClick = { onIntent(EditEstimateUiIntent.CreateDemand) },
+            onClick = { onIntent(EditEstimateUiIntent.MakeOrder) },
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D6EFD)),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
             shape = RoundedCornerShape(8.dp)
         ) {
-            Text("Demanda", color = Color.White)
+            Text("Gerar Pedido", color = Color.White)
         }
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun EditEstimateScreenPreview() {
-    GarageHubTheme(darkTheme = true) {
-        EditEstimateContent(
-            uiState = EditEstimateUiState(
-                estimate = EstimateFullDto(
-                    id = 53,
-                    clientName = "Teste Logística",
-                    vehicleModel = "320i",
-                    vehiclePlate = "AAA1134",
-                    moHourValue = 100.0,
-                    paintingHourValue = 120.0
-                )
-            ),
-            onIntent = {},
-            onBackClick = {}
-        )
+private fun ActionButton(
+    text: String, 
+    icon: androidx.compose.ui.graphics.vector.ImageVector, 
+    modifier: Modifier = Modifier,
+    containerColor: Color = Color(0xFF212529),
+    onClick: () -> Unit
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier,
+        colors = ButtonDefaults.buttonColors(containerColor = containerColor),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp))
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(text, fontSize = 12.sp)
     }
 }
