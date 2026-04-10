@@ -11,6 +11,7 @@ data class EstimateDto(
     @SerialName("veiculo_modelo") val vehicleModel: String? = null,
     @SerialName("status") val status: String? = null,
     @SerialName("foto_principal") val mainPhoto: String? = null,
+    @SerialName("fotos") val photos: List<String>? = null,
     @SerialName("valor_total") val totalValue: Double? = null,
     @SerialName("created_at") val createdAt: String? = null
 )

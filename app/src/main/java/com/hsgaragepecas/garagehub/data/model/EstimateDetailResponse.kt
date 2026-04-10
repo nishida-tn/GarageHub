@@ -48,6 +48,7 @@ data class EstimateFullDto(
     @SerialName("veiculo_ar") val vehicleAir: String? = null,
     @SerialName("veiculo_direcao") val vehicleSteering: String? = null,
     @SerialName("veiculo_cambio") val vehicleTransmission: String? = null,
+    @SerialName("foto_principal") val mainPhoto: String? = null,
     @SerialName("status") val status: String? = null,
     @SerialName("created_at") val createdAt: String? = null
 )
@@ -132,6 +133,7 @@ data class EstimateUpdateRequest(
     @SerialName("veiculo_ar") val vehicleAir: String? = null,
     @SerialName("veiculo_direcao") val vehicleSteering: String? = null,
     @SerialName("veiculo_cambio") val vehicleTransmission: String? = null,
+    @SerialName("foto_principal") val mainPhoto: String? = null,
     @SerialName("items") val items: List<EstimateItemDto> = emptyList()
 )
 

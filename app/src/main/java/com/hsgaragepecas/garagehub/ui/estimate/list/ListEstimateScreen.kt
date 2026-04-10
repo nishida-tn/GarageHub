@@ -230,7 +230,7 @@ fun EstimateCard(
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Box(modifier = Modifier.fillMaxWidth()) {
-                val imageUrl = estimate.mainPhoto?.let {
+                val imageUrl = (estimate.mainPhoto ?: estimate.photos?.firstOrNull())?.let {
                     if (it.startsWith("http")) it else "https://oficina.hsgaragepecas.com.br/storage/$it"
                 }
                 if (imageUrl != null) {
@@ -244,7 +244,7 @@ fun EstimateCard(
                         contentScale = ContentScale.Crop
                     )
                 } else {
-                    Image(
+                    androidx.compose.foundation.Image(
                         painter = painterResource(id = R.drawable.ic_launcher_background),
                         contentDescription = null,
                         modifier = Modifier

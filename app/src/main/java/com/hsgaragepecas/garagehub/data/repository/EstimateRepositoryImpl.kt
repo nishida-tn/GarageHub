@@ -52,14 +52,10 @@ class EstimateRepositoryImpl @Inject constructor(
         request: EstimateUpdateRequest,
         photoUris: List<Uri>
     ): CreateEstimateResponse {
-        // 1. Create the estimate with metadata (JSON)
-        val response = estimateService.createEstimate(request)
-        
-        if (response.ok && response.id != null && photoUris.isNotEmpty()) {
-            val estimateId = response.id
-            val uploadedUrls = mutableListOf<String>()
+        val uploadedUrls = mutableListOf<String>()
 
-            // 2. Upload photos one by one
+        // 1. Upload photos first to get URLs
+        if (photoUris.isNotEmpty()) {
             photoUris.forEach { uri ->
                 val photoPart = compressAndSaveImage(uri)
                 if (photoPart != null) {
@@ -71,14 +67,26 @@ class EstimateRepositoryImpl @Inject constructor(
                     }
                 }
             }
+        }
 
-            // 3. Link uploaded URLs to the estimate
-            if (uploadedUrls.isNotEmpty()) {
-                try {
-                    estimateService.addEstimatePhotos(estimateId, FotosIn(uploadedUrls))
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+        // 2. Prepare request with the first photo as mainPhoto if available
+        val finalRequest = if (uploadedUrls.isNotEmpty()) {
+            request.copy(mainPhoto = uploadedUrls.first())
+        } else {
+            request
+        }
+
+        // 3. Create the estimate with metadata (including mainPhoto)
+        val response = estimateService.createEstimate(finalRequest)
+        
+        if (response.ok && response.id != null && uploadedUrls.isNotEmpty()) {
+            val estimateId = response.id
+
+            // 4. Link all uploaded URLs to the estimate
+            try {
+                estimateService.addEstimatePhotos(estimateId, FotosIn(uploadedUrls))
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
         

@@ -227,15 +227,26 @@ private fun EditEstimateContent(
 
                 SectionHeader(title = "Fotos do veículo (máx. 10)")
                 PhotoPicker()
-                if (uiState.photos.isNotEmpty()) {
+                if (uiState.photos.isNotEmpty() || uiState.vehiclePhotos.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         items(uiState.photos) { photoUrl ->
+                            val fullUrl = if (photoUrl.startsWith("http")) photoUrl else "https://oficina.hsgaragepecas.com.br/storage/$photoUrl"
                             AsyncImage(
-                                model = photoUrl,
+                                model = fullUrl,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(80.dp)
+                                    .clip(RoundedCornerShape(8.dp)),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                        items(uiState.vehiclePhotos) { uri ->
+                            AsyncImage(
+                                model = uri,
                                 contentDescription = null,
                                 modifier = Modifier
                                     .size(80.dp)
