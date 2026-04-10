@@ -5,12 +5,19 @@ import com.hsgaragepecas.garagehub.data.model.CreateEstimateResponse
 import com.hsgaragepecas.garagehub.data.model.EstimateDetailResponse
 import com.hsgaragepecas.garagehub.data.model.EstimateListResponse
 import com.hsgaragepecas.garagehub.data.model.EstimateUpdateRequest
+import com.hsgaragepecas.garagehub.data.model.FotosIn
 import com.hsgaragepecas.garagehub.data.model.TimeSuggestionResponse
+import com.hsgaragepecas.garagehub.data.model.UploadResponse
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Part
+import retrofit2.http.PartMap
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -50,13 +57,38 @@ interface EstimateService {
     /**
      * Creates a new estimate.
      *
-     * @param request The create request.
+     * @param request The create request fields.
      * @return The create estimate response.
      */
     @POST("oficina/orcamentos")
     suspend fun createEstimate(
         @Body request: EstimateUpdateRequest
     ): CreateEstimateResponse
+
+    /**
+     * Uploads a photo for a demand.
+     *
+     * @param photo The photo to upload.
+     * @return The upload response.
+     */
+    @Multipart
+    @POST("oficina/demandas/upload")
+    suspend fun uploadPhoto(
+        @Part photo: MultipartBody.Part
+    ): UploadResponse
+
+    /**
+     * Adds photos to an estimate.
+     *
+     * @param estimateId The ID of the estimate.
+     * @param fotos The photos to add.
+     * @return A map with the result.
+     */
+    @POST("oficina/orcamentos/{orc_id}/fotos")
+    suspend fun addEstimatePhotos(
+        @Path("orc_id") estimateId: Int,
+        @Body fotos: FotosIn
+    ): Map<String, Boolean>
 
     /**
      * Updates an estimate.

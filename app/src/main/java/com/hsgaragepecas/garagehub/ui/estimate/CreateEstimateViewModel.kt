@@ -366,7 +366,7 @@ class CreateEstimateViewModel @Inject constructor(
                     vehicleTransmission = state.vehicleTransmission,
                     items = state.items
                 )
-                val response = createEstimateUseCase(request)
+                val response = createEstimateUseCase(request, state.vehiclePhotos)
                 if (response.ok) {
                     _uiEvent.send(CreateEstimateUiEvent.ShowToast("Orçamento criado com sucesso"))
                     _uiEvent.send(CreateEstimateUiEvent.NavigateBack)

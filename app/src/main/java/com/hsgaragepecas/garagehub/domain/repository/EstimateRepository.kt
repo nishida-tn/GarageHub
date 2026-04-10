@@ -1,5 +1,6 @@
 package com.hsgaragepecas.garagehub.domain.repository
 
+import android.net.Uri
 import com.hsgaragepecas.garagehub.data.model.CreateDemandRequest
 import com.hsgaragepecas.garagehub.data.model.CreateEstimateResponse
 import com.hsgaragepecas.garagehub.data.model.EstimateDetailResponse
@@ -40,9 +41,13 @@ interface EstimateRepository {
      * Creates a new estimate.
      *
      * @param request The create request.
+     * @param photoUris The URIs of the vehicle photos.
      * @return The create estimate response.
      */
-    suspend fun createEstimate(request: EstimateUpdateRequest): CreateEstimateResponse
+    suspend fun createEstimate(
+        request: EstimateUpdateRequest,
+        photoUris: List<Uri> = emptyList()
+    ): CreateEstimateResponse
 
     /**
      * Updates an estimate.

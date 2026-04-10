@@ -162,3 +162,13 @@ data class DemandItemDto(
     @SerialName("ofi_item_id") val estimateItemId: Int? = null,
     @SerialName("ofi_item_idx") val estimateItemIdx: Int? = null
 )
+
+@Serializable
+data class UploadResponse(
+    @SerialName("url") val url: String
+)
+
+@Serializable
+data class FotosIn(
+    @SerialName("urls") val urls: List<String>
+)

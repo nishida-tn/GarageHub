@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -232,9 +230,12 @@ fun EstimateCard(
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Box(modifier = Modifier.fillMaxWidth()) {
-                if (estimate.mainPhoto != null) {
+                val imageUrl = estimate.mainPhoto?.let {
+                    if (it.startsWith("http")) it else "https://oficina.hsgaragepecas.com.br/storage/$it"
+                }
+                if (imageUrl != null) {
                     AsyncImage(
-                        model = estimate.mainPhoto,
+                        model = imageUrl,
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxWidth()
