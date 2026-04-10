@@ -1,5 +1,6 @@
 package com.hsgaragepecas.garagehub.data.repository
 
+import com.hsgaragepecas.garagehub.data.local.AppDatabase
 import com.hsgaragepecas.garagehub.data.local.user.UserPreferencesDataSource
 import com.hsgaragepecas.garagehub.data.model.ForgotPasswordRequest
 import com.hsgaragepecas.garagehub.data.model.LoginRequest
@@ -11,6 +12,8 @@ import com.hsgaragepecas.garagehub.data.model.UserPreferences
 import com.hsgaragepecas.garagehub.data.remote.AuthService
 import com.hsgaragepecas.garagehub.domain.Result
 import com.hsgaragepecas.garagehub.domain.repository.AuthRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -21,7 +24,8 @@ import javax.inject.Inject
  */
 class AuthRepositoryImpl @Inject constructor(
     private val authService: AuthService,
-    private val userPreferencesDataSource: UserPreferencesDataSource
+    private val userPreferencesDataSource: UserPreferencesDataSource,
+    private val database: AppDatabase
 ) : AuthRepository {
 
     override suspend fun login(email: String, password: String): Result<LoginResponse> {
@@ -105,6 +109,9 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun logout() {
-        userPreferencesDataSource.clear()
+        withContext(Dispatchers.IO) {
+            userPreferencesDataSource.clear()
+            database.clearAllTables()
+        }
     }
 }

@@ -27,11 +27,17 @@ fun NavController.navigateToSettingsScreen(navOptions: NavOptions? = null) {
 /**
  * Defines the settings screen in the navigation graph.
  */
-fun NavGraphBuilder.settingsScreen(navController: NavHostController) {
+fun NavGraphBuilder.settingsScreen(
+    navController: NavHostController,
+    onLogout: () -> Unit
+) {
     composable<Settings> {
         SettingsScreen(
             viewModel = hiltViewModel<SettingsViewModelImpl>(),
-            navController = navController
+            onLogout = onLogout,
+            onBack = {
+                navController.popBackStack()
+            }
         )
     }
 }

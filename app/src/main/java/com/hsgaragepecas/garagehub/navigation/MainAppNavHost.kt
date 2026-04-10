@@ -20,6 +20,7 @@ import com.hsgaragepecas.garagehub.ui.settings.navigation.settingsScreen
 @Composable
 fun MainAppNavHost(
     navController: NavHostController,
+    onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -31,6 +32,6 @@ fun MainAppNavHost(
         listEstimateScreen(navController)
         createEstimateScreen(navController)
         editEstimateScreen(navController)
-        settingsScreen(navController)
+        settingsScreen(navController, onLogout)
     }
 }

@@ -30,6 +30,6 @@ fun AppNavHost(
         loginScreen(navController)
         createAccountScreen(navController)
         forgotPasswordScreen(navController)
-        mainScreen()
+        mainScreen(navController)
     }
 }

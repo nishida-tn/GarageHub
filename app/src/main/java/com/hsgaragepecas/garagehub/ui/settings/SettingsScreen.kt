@@ -39,8 +39,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.hsgaragepecas.garagehub.R
 import com.hsgaragepecas.garagehub.ui.theme.GarageDivider
 import com.hsgaragepecas.garagehub.ui.theme.GarageGreyText
@@ -55,13 +53,15 @@ import kotlinx.coroutines.flow.receiveAsFlow
  *
  * @param modifier The modifier to be applied to the screen.
  * @param viewModel The view model that manages the state of the screen.
- * @param navController The navigation controller.
+ * @param onLogout Callback for when the user logs out.
+ * @param onBack Callback for when the user clicks the back button.
  */
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel,
-    navController: NavController
+    onLogout: () -> Unit,
+    onBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
@@ -75,11 +75,7 @@ fun SettingsScreen(
                 }
 
                 is SettingsUiEvent.NavigateToLogin -> {
-                    navController.navigate("login") {
-                        popUpTo(navController.graph.id) {
-                            inclusive = true
-                        }
-                    }
+                    onLogout()
                 }
             }
         }
@@ -107,7 +103,7 @@ fun SettingsScreen(
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Button(
-                    onClick = { navController.popBackStack() },
+                    onClick = onBack,
                     colors = ButtonDefaults.buttonColors(containerColor = GarageYellow)
                 ) {
                     Text(text = stringResource(R.string.back_button), color = Color.Black)
@@ -523,7 +519,11 @@ private fun SettingsScreenPreview() {
         override fun logout() {}
     }
     GarageHubTheme(darkTheme = false) {
-        SettingsScreen(viewModel = mockViewModel, navController = rememberNavController())
+        SettingsScreen(
+            viewModel = mockViewModel,
+            onLogout = {},
+            onBack = {}
+        )
     }
 }
 
@@ -572,6 +572,10 @@ private fun SettingsScreenDarkPreview() {
         override fun logout() {}
     }
     GarageHubTheme(darkTheme = true) {
-        SettingsScreen(viewModel = mockViewModel, navController = rememberNavController())
+        SettingsScreen(
+            viewModel = mockViewModel,
+            onLogout = {},
+            onBack = {}
+        )
     }
 }

@@ -21,7 +21,7 @@ import com.hsgaragepecas.garagehub.navigation.MainAppNavHost
  * The main screen of the application, which contains the bottom navigation bar.
  */
 @Composable
-fun MainScreen() {
+fun MainScreen(onLogout: () -> Unit) {
     val navController = rememberNavController()
     Scaffold(
         bottomBar = {
@@ -30,6 +30,7 @@ fun MainScreen() {
     ) { innerPadding ->
         MainAppNavHost(
             navController = navController,
+            onLogout = onLogout,
             modifier = Modifier.padding(innerPadding)
         )
     }
